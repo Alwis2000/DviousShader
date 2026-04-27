@@ -77,10 +77,6 @@ float time = float(worldTime) * 0.05 * ANIMATION_SPEED;
 float time = frameTimeCounter * ANIMATION_SPEED;
 #endif
 
-#ifdef ADVANCED_MATERIALS
-vec2 dcdx = dFdx(texCoord);
-vec2 dcdy = dFdy(texCoord);
-#endif
 
 vec3 lightVec = sunVec * ((timeAngle < 0.5325 || timeAngle > 0.9675) ? 1.0 : -1.0);
 
@@ -93,68 +89,7 @@ float GetLuminance(vec3 color) {
 	return dot(color,vec3(0.299, 0.587, 0.114));
 }
 
-float GetWaterHeightMap(vec3 worldPos, vec2 offset) {
-    float noise = 0.0, noiseA = 0.0, noiseB = 0.0;
-    
-    vec2 wind = vec2(time) * 0.5 * WATER_SPEED;
 
-	worldPos.xz += worldPos.y * 0.2;
-
-	#if WATER_NORMALS == 1
-	offset /= 256.0;
-	noiseA = texture2D(noisetex, (worldPos.xz - wind) / 256.0 + offset).g;
-	noiseB = texture2D(noisetex, (worldPos.xz + wind) / 48.0 + offset).g;
-	#elif WATER_NORMALS == 2
-	offset /= 256.0;
-	noiseA = texture2D(noisetex, (worldPos.xz - wind) / 256.0 + offset).r;
-	noiseB = texture2D(noisetex, (worldPos.xz + wind) / 96.0 + offset).r;
-	noiseA *= noiseA; noiseB *= noiseB;
-	#endif
-	
-	#if WATER_NORMALS > 0
-	noise = mix(noiseA, noiseB, WATER_DETAIL);
-	#endif
-
-    return noise * WATER_BUMP;
-}
-
-vec3 GetParallaxWaves(vec3 worldPos, vec3 viewVector) {
-	vec3 parallaxPos = worldPos;
-	
-	for(int i = 0; i < 4; i++) {
-		float height = -1.25 * GetWaterHeightMap(parallaxPos, vec2(0.0)) + 0.25;
-		parallaxPos.xz += height * viewVector.xy / dist;
-	}
-	return parallaxPos;
-}
-
-vec3 GetWaterNormal(vec3 worldPos, vec3 viewPos, vec3 viewVector) {
-	vec3 waterPos = worldPos + cameraPosition;
-
-	#if WATER_PIXEL > 0
-	waterPos = floor(waterPos * WATER_PIXEL) / WATER_PIXEL;
-	#endif
-
-	#ifdef WATER_PARALLAX
-	waterPos = GetParallaxWaves(waterPos, viewVector);
-	#endif
-
-	float normalOffset = WATER_SHARPNESS;
-	
-	float fresnel = pow(clamp(1.0 + dot(normalize(normal), normalize(viewPos)), 0.0, 1.0), 8.0);
-	float normalStrength = 0.35 * (1.0 - fresnel);
-
-	float h1 = GetWaterHeightMap(waterPos, vec2( normalOffset, 0.0));
-	float h2 = GetWaterHeightMap(waterPos, vec2(-normalOffset, 0.0));
-	float h3 = GetWaterHeightMap(waterPos, vec2(0.0,  normalOffset));
-	float h4 = GetWaterHeightMap(waterPos, vec2(0.0, -normalOffset));
-
-	float xDelta = (h2 - h1) / normalOffset;
-	float yDelta = (h4 - h3) / normalOffset;
-
-	vec3 normalMap = vec3(xDelta, yDelta, 1.0 - (xDelta * xDelta + yDelta * yDelta));
-	return normalMap * normalStrength + vec3(0.0, 0.0, 1.0 - normalStrength);
-}
 
 //Includes//
 #include "/lib/color/blocklightColor.glsl"
@@ -177,9 +112,6 @@ vec3 GetWaterNormal(vec3 worldPos, vec3 viewPos, vec3 viewVector) {
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 //Program//
 void main() {
@@ -217,11 +149,7 @@ void main() {
 		translucent = 0.0;
 		#endif
 
-		#ifdef TAA
-		vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
-		#else
 		vec3 viewPos = ToNDC(screenPos);
-		#endif
 		vec3 worldPos = ToWorld(viewPos);
 
 		float dither = Bayer8(gl_FragCoord.xy);
@@ -240,12 +168,7 @@ void main() {
 							  tangent.y, binormal.y, normal.y,
 							  tangent.z, binormal.z, normal.z);
 
-		#if WATER_NORMALS == 1 || WATER_NORMALS == 2
-		if (water > 0.5) {
-			normalMap = GetWaterNormal(worldPos, viewPos, viewVector);
-			newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-		}
-		#endif
+
 
 		#if REFRACTION == 1
 		refraction = vec3((newNormal.xy - normal.xy) * 0.5 + 0.5, float(albedo.a < 0.95) * water);
@@ -321,7 +244,7 @@ void main() {
 			fresnel*= max(1.0 - isEyeInWater * 0.5 * water, 0.5);
 			// fresnel = 1.0;
 			
-			#if REFLECTION == 2
+			#if REFLECTION == 1 || REFLECTION == 2
 			reflection = SimpleReflection(viewPos, newNormal, dither, reflectionMask);
 			reflection.rgb = pow(reflection.rgb * 2.0, vec3(8.0));
 			#endif
@@ -385,11 +308,7 @@ void main() {
 		if((isEyeInWater == 0 && water > 0.5) || (isEyeInWater == 1 && water < 0.5)) {
 			float opaqueDepth = texture2D(depthtex1, screenPos.xy).r;
 			vec3 opaqueScreenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), opaqueDepth);
-			#ifdef TAA
-			vec3 opaqueViewPos = ToNDC(vec3(TAAJitter(opaqueScreenPos.xy, -0.5), opaqueScreenPos.z));
-			#else
 			vec3 opaqueViewPos = ToNDC(opaqueScreenPos);
-			#endif
 
 			vec4 waterFog = GetWaterFog(opaqueViewPos - viewPos.xyz, fogAlbedo);
 			albedo = mix(waterFog, vec4(albedo.rgb, 1.0), albedo.a);
@@ -438,11 +357,6 @@ uniform vec3 relativeEyePosition;
 uniform mat4 dhProjection;
 uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth, viewHeight;
-#endif
 
 //Attributes//
 attribute vec4 mc_Entity;
@@ -469,9 +383,6 @@ float WavingWater(vec3 worldPos) {
 }
 
 //Includes//
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -533,9 +444,6 @@ void main() {
 	gl_Position = dhProjection * gbufferModelView * position;
 	if (mat == 0.0) gl_Position.z -= 0.00001;
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

@@ -46,18 +46,12 @@ Please don't edit anything from Undefine section and onwards.
   #define SHADOW_SKY_FALLOFF 0.7333
   // #define CONTACT_SHADOWS 0
 
-//#define AO
   #define MULTICOLORED_BLOCKLIGHT
 //#define DESATURATION
   #define DESATURATION_FACTOR 1.5 //[2.0 1.5 1.0 0.5 0.0]
   #define DYNAMIC_HANDLIGHT 2 //[0 1 2]
 //#define HALF_LAMBERT
-  
-/*
-  #define AO_METHOD 0 //[0 1]
-  #define AO_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
-  const float ambientOcclusionLevel = 1.00; //[0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
-*/
+
 
 //#define MCBL_FOG
   #define MCBL_FOG_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
@@ -69,8 +63,6 @@ Please don't edit anything from Undefine section and onwards.
 //#define MCBL_SS_ANTI_BLEED
 
 //Material//
-//#define ADVANCED_MATERIALS
-  #define MATERIAL_FORMAT 1 //[0 1]
 
   #define REFLECTION 2 //[0 1 2]
   #define REFLECTION_TRANSLUCENT
@@ -262,66 +254,6 @@ Please don't edit anything from Undefine section and onwards.
   #define BLOCKLIGHT_B 100 //[0 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200 204 208 212 216 220 224 228 232 236 240 244 248 252 255]
   #define BLOCKLIGHT_I 1.00 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00 1.05 1.10 1.15 1.20 1.25 1.30 1.35 1.40 1.45 1.50 1.55 1.60 1.65 1.70 1.75 1.80 1.85 1.90 1.95 2.00 2.05 2.10 2.15 2.20 2.25 2.30 2.35 2.40 2.45 2.50 2.55 2.60 2.65 2.70 2.75 2.80 2.85 2.90 2.95 3.00 3.05 3.10 3.15 3.20 3.25 3.30 3.35 3.40 3.45 3.50 3.55 3.60 3.65 3.70 3.75 3.80 3.85 3.90 3.95 4.00]
 
-// Global Lighting Palette //
-  #define PALETTE_RED_R 255 //[0 32 64 96 128 160 192 224 255]
-  #define PALETTE_RED_G 32
-  #define PALETTE_RED_B 0
-  #define PALETTE_RED_I 4.0 //[1.0 2.0 3.0 4.0 6.0 8.0]
-
-  #define PALETTE_ORANGE_R 255
-  #define PALETTE_ORANGE_G 160
-  #define PALETTE_ORANGE_B 64
-  #define PALETTE_ORANGE_I 4.0
-
-  #define PALETTE_YELLOW_R 255
-  #define PALETTE_YELLOW_G 255
-  #define PALETTE_YELLOW_B 64
-  #define PALETTE_YELLOW_I 4.0
-
-  #define PALETTE_LIME_R 160
-  #define PALETTE_LIME_G 255
-  #define PALETTE_LIME_B 64
-  #define PALETTE_LIME_I 4.0
-
-  #define PALETTE_GREEN_R 64
-  #define PALETTE_GREEN_G 255
-  #define PALETTE_GREEN_B 64
-  #define PALETTE_GREEN_I 4.0
-
-  #define PALETTE_EMERALD_R 64
-  #define PALETTE_EMERALD_G 255
-  #define PALETTE_EMERALD_B 160
-  #define PALETTE_EMERALD_I 4.0
-
-  #define PALETTE_CYAN_R 64
-  #define PALETTE_CYAN_G 255
-  #define PALETTE_CYAN_B 255
-  #define PALETTE_CYAN_I 4.0
-
-  #define PALETTE_LTBLUE_R 64
-  #define PALETTE_LTBLUE_G 160
-  #define PALETTE_LTBLUE_B 255
-  #define PALETTE_LTBLUE_I 4.0
-
-  #define PALETTE_BLUE_R 64
-  #define PALETTE_BLUE_G 64
-  #define PALETTE_BLUE_B 255
-  #define PALETTE_BLUE_I 4.0
-
-  #define PALETTE_PURPLE_R 160
-  #define PALETTE_PURPLE_G 64
-  #define PALETTE_PURPLE_B 255
-  #define PALETTE_PURPLE_I 4.0
-
-  #define PALETTE_MAGENTA_R 255
-  #define PALETTE_MAGENTA_G 64
-  #define PALETTE_MAGENTA_B 255
-  #define PALETTE_MAGENTA_I 4.0
-
-  #define PALETTE_PINK_R 255
-  #define PALETTE_PINK_G 64
-  #define PALETTE_PINK_B 160
-  #define PALETTE_PINK_I 4.0
 
   #define SKY_R 96 //[0 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200 204 208 212 216 220 224 228 232 236 240 244 248 252 255]
   #define SKY_G 160 //[0 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200 204 208 212 216 220 224 228 232 236 240 244 248 252 255]
@@ -439,10 +371,7 @@ Please don't edit anything from Undefine section and onwards.
 //Tonemap & Color Grading//
   #define EXPOSURE 0.00 //[-2.00 -1.75 -1.50 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
 
-//#define AUTO_EXPOSURE
-//#define CLASSIC_EXPOSURE
-  #define AUTO_EXPOSURE_RADIUS 0.7 //[0.002 0.04 0.18 0.35 0.7]
-  #define AUTO_EXPOSURE_SPEED 3.33 //[0.33 1.00 3.33 10.00 33.33]
+
 
 //#define COLOR_GRADING
 
@@ -497,9 +426,6 @@ Please don't edit anything from Undefine section and onwards.
   #endif
 
 //Sharpen Define//
-  #if SHARPEN > 0 || (SHARPEN == -1 && defined FXAA && defined TAA)
-  #define SHARPEN_ENABLED
-  #endif
 
 //Far Vanilla Fog Defines//
   #if FAR_VANILLA_FOG > 0
@@ -580,31 +506,3 @@ Please don't edit anything from Undefine section and onwards.
   //#define FOG_INTERIOR
 #endif
 
-// Purged Settings Fallbacks
-#ifndef DOF
-  //#define DOF
-#endif
-#ifndef BLOOM_RADIUS
-  #define BLOOM_RADIUS 0
-#endif
-#ifndef BLOOM_STRENGTH
-  #define BLOOM_STRENGTH 0.0
-#endif
-#ifndef BLOOM_CONTRAST
-  #define BLOOM_CONTRAST 0.0
-#endif
-#ifndef VIGNETTE
-  //#define VIGNETTE
-#endif
-#ifndef VIGNETTE_STRENGTH
-  #define VIGNETTE_STRENGTH 0.0
-#endif
-#ifndef FXAA
-  //#define FXAA
-#endif
-#ifndef TAA
-  //#define TAA
-#endif
-#ifndef SHARPEN
-  #define SHARPEN 0.0
-#endif

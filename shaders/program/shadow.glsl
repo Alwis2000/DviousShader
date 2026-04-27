@@ -49,20 +49,12 @@ float GetWaterHeightMap(vec3 worldPos, vec2 offset) {
 
 	worldPos.xz -= worldPos.y * 0.2;
 
-	#if WATER_NORMALS == 1
 	offset /= 256.0;
 	noiseA = texture2D(noisetex, (worldPos.xz - wind) / 256.0 + offset).g;
 	noiseB = texture2D(noisetex, (worldPos.xz + wind) / 48.0 + offset).g;
-	#elif WATER_NORMALS == 2
-	offset /= 256.0;
-	noiseA = texture2D(noisetex, (worldPos.xz - wind) / 256.0 + offset).r;
-	noiseB = texture2D(noisetex, (worldPos.xz + wind) / 96.0 + offset).r;
-	noiseA *= noiseA; noiseB *= noiseB;
-	#endif
+
 	
-	#if WATER_NORMALS > 0
 	noise = mix(noiseA, noiseB, WATER_DETAIL);
-	#endif
 
     return noise * WATER_CAUSTICS_STRENGTH;
 }
@@ -130,11 +122,7 @@ void main() {
 
 				float height = max((xDeltaA * -xDeltaB + yDeltaA * -yDeltaB), 0.0);
 
-				#if WATER_NORMALS == 1
 				height *= 48.0;
-				#elif WATER_NORMALS == 2
-				height *= 24.0;
-				#endif
 
 				#ifdef WATER_SHADOW_COLOR
 					height /= length(albedo.rgb);

@@ -45,12 +45,6 @@ void main() {
     /* DRAWBUFFERS:0 */
 	gl_FragData[0] = albedo;
 
-	#ifdef ADVANCED_MATERIALS
-	/* DRAWBUFFERS:0367 */
-	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
-	gl_FragData[2] = vec4(0.0, 0.0, float(gl_FragCoord.z < 1.0), 1.0);
-	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
-	#endif
 }
 
 #endif
@@ -64,13 +58,6 @@ varying vec2 texCoord;
 varying vec4 color;
 
 //Uniforms//
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth;
-uniform float viewHeight;
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -85,9 +72,6 @@ void main() {
 
 	gl_Position = ftransform();
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

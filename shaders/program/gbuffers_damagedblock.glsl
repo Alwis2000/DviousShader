@@ -41,13 +41,6 @@ void main() {
 varying vec2 texCoord;
 
 //Uniforms//
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth;
-uniform float viewHeight;
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -60,9 +53,6 @@ void main() {
 
 	gl_Position = ftransform();
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

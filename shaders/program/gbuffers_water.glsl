@@ -85,14 +85,6 @@ uniform sampler2D gaux2;
 uniform sampler2D depthtex1;
 uniform sampler2D noisetex;
 
-#ifdef ADVANCED_MATERIALS
-uniform ivec2 atlasSize;
-
-uniform sampler2D specular;
-uniform sampler2D normals;
-
-
-#endif
 
 #if DYNAMIC_HANDLIGHT > 0
 uniform int heldBlockLightValue, heldBlockLightValue2;
@@ -142,68 +134,12 @@ float GetLuminance(vec3 color) {
 	return dot(color,vec3(0.299, 0.587, 0.114));
 }
 
-float GetWaterHeightMap(vec3 worldPos, vec2 offset) {
-    float noise = 0.0, noiseA = 0.0, noiseB = 0.0;
-    
-    vec2 wind = vec2(time) * 0.5 * WATER_SPEED;
 
-	worldPos.xz += worldPos.y * 0.2;
-
-	#if WATER_NORMALS == 1
-	offset /= 256.0;
-	noiseA = texture2DLod(noisetex, (worldPos.xz - wind) / 256.0 + offset, 0).g;
-	noiseB = texture2DLod(noisetex, (worldPos.xz + wind) / 48.0 + offset, 0).g;
-	#elif WATER_NORMALS == 2
-	offset /= 256.0;
-	noiseA = texture2DLod(noisetex, (worldPos.xz - wind) / 256.0 + offset, 0).r;
-	noiseB = texture2DLod(noisetex, (worldPos.xz + wind) / 96.0 + offset, 0).r;
-	noiseA *= noiseA; noiseB *= noiseB;
-	#endif
-	
-	#if WATER_NORMALS > 0
-	noise = mix(noiseA, noiseB, WATER_DETAIL);
-	#endif
-
-    return noise * WATER_BUMP;
-}
-
-vec3 GetParallaxWaves(vec3 worldPos, vec3 viewVector) {
-	float height = -0.5 * GetWaterHeightMap(worldPos, vec2(0.0)) + 0.1;
-	worldPos.xz += (height * viewVector.xy / dist) * 0.4;
-	return worldPos;
-}
-
-vec3 GetWaterNormal(vec3 worldPos, vec3 viewPos, vec3 viewVector) {
-	vec3 waterPos = worldPos + cameraPosition;
-
-	#if WATER_PIXEL > 0
-	waterPos = floor(waterPos * WATER_PIXEL) / WATER_PIXEL;
-	#endif
-
-	#ifdef WATER_PARALLAX
-	waterPos = GetParallaxWaves(waterPos, viewVector);
-	#endif
-
-	float normalOffset = WATER_SHARPNESS;
-	
-	float h0 = GetWaterHeightMap(waterPos, vec2(0.0));
-	float h1 = GetWaterHeightMap(waterPos, vec2(normalOffset, 0.0));
-	float h2 = GetWaterHeightMap(waterPos, vec2(0.0, normalOffset));
-
-	float xDelta = (h0 - h1) / normalOffset;
-	float yDelta = (h0 - h2) / normalOffset;
-
-	vec3 normalMap = normalize(vec3(xDelta, yDelta, 0.25));
-	return normalMap;
-}
 
 void NetherPortalParallax(inout vec4 albedo, float dither) {
 	int sampleCount = 4;
 	float parallaxDepth = 0.125;
 
-	#ifdef TAA
-	dither = fract(dither + frameCounter * 0.618);
-	#endif
 	
 	for (int i = 0; i < sampleCount; i++) {
 		float currentDepth = float(i + dither) / sampleCount * parallaxDepth;
@@ -231,17 +167,7 @@ void NetherPortalParallax(inout vec4 albedo, float dither) {
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
-#ifdef ADVANCED_MATERIALS
-
-#include "/lib/surface/directionalLightmap.glsl"
-
-
-
-#endif
 
 #ifdef MULTICOLORED_BLOCKLIGHT
 #include "/lib/util/voxelMapHelper.glsl"
@@ -262,19 +188,6 @@ void main() {
 	float smoothness = 0.0;
 	vec3 refraction = vec3(0.0);
 	
-	#ifdef ADVANCED_MATERIALS
-	vec2 newCoord = vTexCoord.st * vTexCoordAM.pq + vTexCoordAM.st;
-	float surfaceDepth = 1.0;
-	float parallaxFade = clamp((dist - PARALLAX_DISTANCE) / 32.0, 0.0, 1.0);
-	float skipParallax = float(mat > 0.98 && mat < 1.02);
-		  skipParallax+= float(mat > 4.98 && mat < 5.02);
-
-	#ifdef PARALLAX_PORTAL
-		  skipParallax+= float(mat > 3.98 && mat < 4.02);
-	#endif
-	
-
-	#endif
 
 
 
@@ -319,32 +232,8 @@ void main() {
 							  tangent.y, binormal.y, normal.y,
 							  tangent.z, binormal.z, normal.z);
 
-		#if WATER_NORMALS > 0
-		if (water > 0.5) {
-			#if WATER_NORMALS == 1 || WATER_NORMALS == 2
-			normalMap = GetWaterNormal(worldPos, viewPos, viewVector);
-			newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-			#elif WATER_NORMALS == 3 && defined ADVANCED_MATERIALS
-			float tempF0 = 0.04, tempPorosity = 0.0, tempAo = 1.0;
-			vec3 normalMap = vec3(0.0, 0.0, 1.0);
-			smoothness = 0.9;
-			emission = 0.0;
 
-			newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-			#endif
-		}
-		#endif
 
-		#ifdef ADVANCED_MATERIALS
-		if (water < 0.5) {
-			float f0 = 0.04, porosity = 0.0, ao = 1.0;
-			vec3 normalMap = vec3(0.0, 0.0, 1.0);
-			smoothness = 0.0;
-
-			if ((normalMap.x > -0.999 || normalMap.y > -0.999) && viewVector == viewVector)
-				newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-		}
-		#endif
 
 		#if REFRACTION == 1
 		refraction = vec3((newNormal.xy - normal.xy) * 0.5 + 0.5, float(albedo.a < 0.95) * water);
@@ -433,27 +322,6 @@ void main() {
 			  vanillaDiffuse*= vanillaDiffuse;
 
 		float parallaxShadow = 1.0;
-		#ifdef ADVANCED_MATERIALS
-		vec3 rawAlbedo = albedo.rgb * 0.999 + 0.001;
-		albedo.rgb *= ao;
-
-		#ifdef REFLECTION_SPECULAR
-		albedo.rgb *= 1.0;
-		#endif
-		
-		#ifdef SELF_SHADOW
-		if (lightmap.y > 0.0 && NoL > 0.0 && water < 0.5) {
-			parallaxShadow = GetParallaxShadow(surfaceDepth, parallaxFade, newCoord, lightVec,
-											   tbnMatrix);
-		}
-		#endif
-
-		#ifdef DIRECTIONAL_LIGHTMAP
-		mat3 lightmapTBN = GetLightmapTBN(viewPos);
-		lightmap.x = DirectionalLightmap(lightmap.x, lmCoord.x, newNormal, lightmapTBN);
-		lightmap.y = DirectionalLightmap(lightmap.y, lmCoord.y, newNormal, lightmapTBN);
-		#endif
-		#endif
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0);
@@ -463,9 +331,6 @@ void main() {
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
-		#ifdef ADVANCED_MATERIALS
-
-		#endif
 		
 		float fresnel = 0.30; // Mirror-like water for toon aesthetic
 
@@ -480,9 +345,13 @@ void main() {
 			fresnel*= max(1.0 - isEyeInWater * 0.5 * water, 0.5);
 			// fresnel = 1.0;
 			
-			#if REFLECTION == 2
+			#if REFLECTION == 1
+			reflection = SimpleReflection(viewPos, newNormal, dither, reflectionMask);
+			#elif REFLECTION == 2
 			reflection = DHReflection(viewPos, newNormal, dither, reflectionMask);
 			#endif
+
+			reflection.rgb = pow(reflection.rgb * 2.0, vec3(8.0));
 			
 			if (reflection.a < 1.0) {
 				#ifdef OVERWORLD
@@ -539,75 +408,6 @@ void main() {
 			albedo.a = mix(albedo.a, 1.0, fresnel);
 			#endif
 		} else if (albedo.a > 0.01) {
-			#ifdef ADVANCED_MATERIALS
-			skyOcclusion = lightmap.y;
-			#if REFLECTION_SKY_FALLOFF > 1
-			skyOcclusion = clamp(1.0 - (1.0 - skyOcclusion) * REFLECTION_SKY_FALLOFF, 0.0, 1.0);
-			#endif
-			skyOcclusion *= skyOcclusion;
-
-			baseReflectance = vec3(f0);
-
-			#ifdef REFLECTION_SPECULAR
-			vec3 fresnel3 = mix(baseReflectance, vec3(1.0), fresnel);
-			#if MATERIAL_FORMAT == 0
-			if (f0 >= 0.9 && f0 < 1.0) {
-				baseReflectance = GetMetalCol(f0);
-				fresnel3 = ComplexFresnel(pow(fresnel, 0.2), f0);
-				#ifdef ALBEDO_METAL
-				fresnel3 *= rawAlbedo;
-				#endif
-			}
-			#endif
-			
-			float aoSquared = ao * ao;
-			shadow *= aoSquared; fresnel3 *= aoSquared * smoothness * smoothness;
-
-			if (smoothness > 0.0) {
-				vec4 reflection = vec4(0.0);
-				vec3 skyReflection = vec3(0.0);
-				float reflectionMask = 0.0;
-				
-				float ssrMask = clamp(length(fresnel3) * 400.0 - 1.0, 0.0, 1.0);
-				if(ssrMask > 0.0) reflection = SimpleReflection(viewPos, newNormal, dither, reflectionMask);
-				reflection.rgb = pow(reflection.rgb * 2.0, vec3(8.0));
-				reflection.a *= ssrMask;
-
-				if (reflection.a < 1.0) {
-					#ifdef OVERWORLD
-					vec3 skyRefPos = reflect(normalize(viewPos.xyz), newNormal);
-					skyReflection = GetSkyColor(skyRefPos, true);
-					
-					#if AURORA > 0
-					skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12);
-					#endif
-					
-
-
-//					#ifdef CLASSIC_EXPOSURE
-//					skyReflection *= 4.0 - 3.0 * eBS;
-//					#endif
-
-					skyReflection = mix(vanillaDiffuse * minLightCol, skyReflection, skyOcclusion);
-					#endif
-
-					#ifdef NETHER
-					skyReflection = netherCol.rgb * 0.04;
-					#endif
-
-					#ifdef END
-					skyReflection = endCol.rgb * 0.01;
-					#endif
-				}
-
-				reflection.rgb = max(mix(skyReflection, reflection.rgb, reflectionMask), vec3(0.0));
-
-				albedo.rgb = albedo.rgb * (1.0 - fresnel3) +
-							 reflection.rgb * fresnel3;
-				albedo.a = mix(albedo.a, 1.0, GetLuminance(fresnel3));
-			}
-			#endif
-			#endif
 
 			#if (defined OVERWORLD || defined END) && SPECULAR_HIGHLIGHT == 2
 			vec3 specularColor = GetSpecularColor(lightmap.y, baseReflectance);
@@ -621,11 +421,7 @@ void main() {
 		if((isEyeInWater == 0 && water > 0.5) || (isEyeInWater == 1 && water < 0.5)) {
 			float opaqueDepth = texture2D(depthtex1, screenPos.xy).r;
 			vec3 opaqueScreenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), opaqueDepth);
-			#ifdef TAA
-			vec3 opaqueViewPos = ToNDC(vec3(TAAJitter(opaqueScreenPos.xy, -0.5), opaqueScreenPos.z));
-			#else
 			vec3 opaqueViewPos = ToNDC(opaqueScreenPos);
-			#endif
 
 			vec4 waterFog = GetWaterFog(opaqueViewPos - viewPos.xyz, fogAlbedo);
 			waterFog.rgb *= waterFog.a;
@@ -685,11 +481,6 @@ uniform float far;
 
 uniform vec3 relativeEyePosition;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth, viewHeight;
-#endif
 
 //Attributes//
 attribute vec4 mc_Entity;
@@ -723,9 +514,6 @@ float WavingWater(vec3 worldPos) {
 }
 
 //Includes//
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -808,9 +596,6 @@ void main() {
 	gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
 	if (mat == 0.0) gl_Position.z -= 0.00001;
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

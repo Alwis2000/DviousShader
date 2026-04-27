@@ -47,13 +47,6 @@ varying vec2 texCoord;
 varying vec4 color;
 
 //Uniforms//
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth;
-uniform float viewHeight;
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -68,9 +61,6 @@ void main() {
 
 	gl_Position = ftransform();
 	
-	#if defined TAA && !defined TAA_SELECTIVE
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

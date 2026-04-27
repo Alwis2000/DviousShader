@@ -109,9 +109,6 @@ float GetLuminance(vec3 color) {
 #include "/lib/lighting/dynamicHandlight.glsl"
 #include "/lib/lighting/forwardLighting.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 #ifdef MULTICOLORED_BLOCKLIGHT
 #include "/lib/util/voxelMapHelper.glsl"
@@ -129,11 +126,7 @@ void main() {
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
-		#if defined TAA
-		vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
-		#else
 		vec3 viewPos = ToNDC(screenPos);
-		#endif
 		vec3 worldPos = ToWorld(viewPos);
 		
 		#if DYNAMIC_HANDLIGHT == 2
@@ -184,19 +177,7 @@ void main() {
 		/* DRAWBUFFERS:08 */
 		gl_FragData[1] = vec4(0.0,0.0,0.0,1.0);
 
-		#ifdef ADVANCED_MATERIALS
-		/* DRAWBUFFERS:08367 */
-		gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
-		gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
-		gl_FragData[4] = vec4(0.0, 0.0, 0.0, 1.0);
-		#endif
 	#else
-		#ifdef ADVANCED_MATERIALS
-		/* DRAWBUFFERS:0367 */
-		gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
-		gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
-		gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
-		#endif
 	#endif
 }
 
@@ -223,11 +204,6 @@ uniform vec3 cameraPosition;
 
 uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth, viewHeight;
-#endif
 
 //Attributes//
 attribute vec4 mc_Entity;
@@ -241,9 +217,6 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 #endif
 
 //Includes//
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -276,9 +249,6 @@ void main() {
 
 	gl_Position = ftransform();
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

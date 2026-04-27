@@ -99,9 +99,6 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 #include "/lib/lighting/forwardLighting.glsl"
 #include "/lib/util/encode.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 #ifdef MCBL_SS
 #include "/lib/util/voxelMapHelper.glsl"
@@ -150,11 +147,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		emission *= GetHardcodedEmission(albedo.rgb, hsv);
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
-		#ifdef TAA
-		vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
-		#else
 		vec3 viewPos = ToNDC(screenPos);
-		#endif
 		vec3 worldPos = mat3(vxModelViewInv) * viewPos + vxModelViewInv[3].xyz;
 
 		vec3 normal = vec3(0.0);

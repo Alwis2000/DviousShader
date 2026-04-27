@@ -61,10 +61,6 @@ float time = float(worldTime) * 0.05 * ANIMATION_SPEED;
 float time = frameTimeCounter * ANIMATION_SPEED;
 #endif
 
-#ifdef ADVANCED_MATERIALS
-vec2 dcdx = dFdx(texCoord);
-vec2 dcdy = dFdy(texCoord);
-#endif
 
 vec3 lightVec = sunVec * ((timeAngle < 0.5325 || timeAngle > 0.9675) ? 1.0 : -1.0);
 
@@ -108,9 +104,6 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 #include "/lib/surface/hardcodedEmission.glsl"
 #include "/lib/util/encode.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 //Program//
 void main() {
@@ -136,11 +129,7 @@ void main() {
 		emission *= GetHardcodedEmission(albedo.rgb, hsv);
 		
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
-		#ifdef TAA
-		vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
-		#else
 		vec3 viewPos = ToNDC(screenPos);
-		#endif
 		vec3 worldPos = ToWorld(viewPos);
 
 		float dither = Bayer8(gl_FragCoord.xy);
@@ -245,11 +234,6 @@ uniform vec3 relativeEyePosition;
 uniform mat4 dhProjection;
 uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth, viewHeight;
-#endif
 
 //Attributes//
 attribute vec4 mc_Entity;
@@ -265,9 +249,6 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 //Includes//
 #include "/lib/vertex/waving.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -325,9 +306,6 @@ void main() {
 
 	gl_Position = dhProjection * gbufferModelView * position;
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

@@ -150,13 +150,6 @@ uniform float timeAngle;
 
 uniform mat4 gbufferModelView;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth;
-uniform float viewHeight;
-#include "/lib/util/jitter.glsl"
-#endif
 
 //Program//
 void main() {
@@ -181,9 +174,6 @@ void main() {
 	
 	gl_Position = ftransform();
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif

@@ -34,17 +34,7 @@ uniform sampler2D colortex3;
 uniform sampler2D depthtex0;
 uniform sampler2D noisetex;
 
-#ifdef AO
-uniform sampler2D colortex4;
-#endif
 
-#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-uniform vec3 previousCameraPosition;
-
-uniform sampler2D colortex5;
-uniform sampler2D colortex6;
-uniform sampler2D colortex7;
-#endif
 
 #if defined MCBL_SS || defined OUTLINE_ENABLED
 uniform sampler2D colortex8;
@@ -74,15 +64,7 @@ uniform sampler2D dhDepthTex0;
 uniform sampler2D dhDepthTex1;
 #endif
 
-#if (defined VOXY || defined DISTANT_HORIZONS) && !(defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR)
-uniform sampler2D colortex6;
-#endif
 
-#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-const bool colortex0MipmapEnabled = true;
-const bool colortex5MipmapEnabled = true;
-const bool colortex6MipmapEnabled = true;
-#endif
 
 float eBS = eyeBrightnessSmooth.y / 240.0;
 float sunVisibility  = clamp(dot( sunVec, upVec) * 10.0 + 0.5, 0.0, 1.0);
@@ -118,13 +100,6 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 	#if defined OVERWORLD || defined END
 	float shadow = 1.0;
 
-	#ifdef TAA
-	#if TAA_MODE == 0
-	dither = fract(dither + frameCounter * 0.618);
-	#else
-	dither = fract(dither + frameCounter * 0.5);
-	#endif
-	#endif
 
 	float traceZ = 0.0;
 	float zDelta = 0.0;
@@ -214,11 +189,6 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 
 #include "/lib/util/encode.glsl"
 
-#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-#include "/lib/reflections/raytrace.glsl"
-
-#include "/lib/reflections/simpleReflections.glsl"
-#endif
 
 #ifdef END
 vec3 GetEndSkyColor(vec3 viewPos) {
@@ -301,67 +271,6 @@ void main() {
 	#endif
 
 	if (z < 1.0) {
-		#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-		float smoothness = 0.0, skyOcclusion = 0.0;
-		vec3 normal = vec3(0.0), fresnel3 = vec3(0.0);
-
-		vec3 specularData = texture2D(colortex3, texCoord).rgb;
-
-		smoothness = specularData.r;
-		smoothness *= smoothness;
-		smoothness /= 2.0 - smoothness;
-
-		skyOcclusion = specularData.g;
-		#if REFLECTION_SKY_FALLOFF > 1
-		skyOcclusion = clamp(1.0 - (1.0 - skyOcclusion) * REFLECTION_SKY_FALLOFF, 0.0, 1.0);
-		#endif
-		skyOcclusion *= skyOcclusion;
-
-		normal = DecodeNormal(texture2D(colortex6, texCoord).xy);
-
-		fresnel3 = texture2D(colortex7, texCoord).rgb * smoothness;
-
-		if (smoothness > 0.0) {
-			vec4 reflection = vec4(0.0);
-			vec3 skyReflection = vec3(0.0);
-
-			float ssrMask = clamp(length(fresnel3) * 400.0 - 1.0, 0.0, 1.0);
-			float reflectionMask = 0.0;
-			if(ssrMask > 0.0) reflection = SimpleReflection(viewPos.xyz, normal, dither, reflectionMask);
-			reflection.a *= ssrMask;
-
-			if (reflection.a < 1.0) {
-				#ifdef OVERWORLD
-				vec3 skyRefPos = reflect(normalize(viewPos.xyz), normal);
-				skyReflection = GetSkyColor(skyRefPos, true);
-
-				#if AURORA > 0
-				skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12);
-				#endif
-
-
-
-				float NoU = clamp(dot(normal, upVec), -1.0, 1.0);
-				float NoE = clamp(dot(normal, eastVec), -1.0, 1.0);
-				float vanillaDiffuse = (0.25 * NoU + 0.75) +
-									   (0.5 - abs(NoE)) * (1.0 - abs(NoU)) * 0.1;
-				vanillaDiffuse *= vanillaDiffuse;
-
-				skyReflection = mix(vanillaDiffuse * minLightCol, skyReflection, skyOcclusion);
-				#endif
-				#ifdef NETHER
-				skyReflection = netherCol.rgb * 0.04;
-				#endif
-				#ifdef END
-				skyReflection = endCol.rgb * 0.025;
-				#endif
-			}
-
-			reflection.rgb = max(mix(skyReflection, reflection.rgb, reflection.a), vec3(0.0));
-
-			color.rgb += reflection.rgb * fresnel3;
-		}
-		#endif
 
 		Fog(color.rgb, viewPos.xyz);
 	#ifdef VOXY

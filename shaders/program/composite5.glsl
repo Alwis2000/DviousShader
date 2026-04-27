@@ -29,10 +29,6 @@ uniform sampler2D depthtex0;
 uniform sampler2D colortex7;
 #endif
 
-#ifdef LENS_FLARE
-uniform vec3 sunPosition;
-uniform mat4 gbufferProjection;
-#endif
 
 #ifdef SKY_UNDERGROUND
 uniform vec3 cameraPosition;
@@ -44,9 +40,6 @@ uniform sampler2D colortex9;
 
 const bool colortex2Clear = false;
 
-#ifdef AUTO_EXPOSURE
-const bool colortex0MipmapEnabled = true;
-#endif
 
 #ifdef MCBL_SS
 const bool colortex9MipmapEnabled = true;
@@ -181,19 +174,9 @@ void ColorSaturation(inout vec3 color) {
 	color = color * SATURATION - graySaturation * (SATURATION - 1.0);
 }
 
-#ifdef LENS_FLARE
-vec2 GetLightPos() {
-	vec4 tpos = gbufferProjection * vec4(sunPosition, 1.0);
-	tpos.xyz /= tpos.w;
-	return tpos.xy / tpos.z * 0.5;
-}
-#endif
 
 #include "/lib/color/lightColor.glsl"
 
-#ifdef LENS_FLARE
-
-#endif
 
 void main() {
     vec2 newTexCoord = texCoord;
@@ -204,13 +187,7 @@ void main() {
 
 	vec3 color = texture2D(colortex0, newTexCoord).rgb;
 
-	#ifdef AUTO_EXPOSURE
-	float tempExposure = texture2D(colortex2, vec2(pw, ph)).r;
-	#endif
 
-	#ifdef LENS_FLARE
-	float tempVisibleSun = texture2D(colortex2, vec2(3.0 * pw, ph)).r;
-	#endif
 
 	color = pow(color, vec3(1.0 / 2.2));
 

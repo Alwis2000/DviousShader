@@ -19,14 +19,6 @@ varying vec3 sunVec, upVec, eastVec;
 
 varying vec4 color;
 
-#ifdef ADVANCED_MATERIALS
-varying float dist;
-
-varying vec3 binormal, tangent;
-varying vec3 viewVector;
-
-varying vec4 vTexCoord, vTexCoordAM;
-#endif
 
 //Uniforms//
 uniform int frameCounter;
@@ -58,12 +50,6 @@ uniform mat4 shadowModelView;
 uniform sampler2D texture;
 uniform sampler2D noisetex;
 
-#ifdef ADVANCED_MATERIALS
-uniform ivec2 atlasSize;
-
-uniform sampler2D specular;
-uniform sampler2D normals;
-#endif
 
 #if DYNAMIC_HANDLIGHT > 0
 uniform int heldBlockLightValue, heldBlockLightValue2;
@@ -89,10 +75,6 @@ float moonVisibility = clamp(dot(-sunVec, upVec) * 10.0 + 0.5, 0.0, 1.0);
 
 float time = frameTimeCounter * ANIMATION_SPEED;
 
-#ifdef ADVANCED_MATERIALS
-vec2 dcdx = dFdx(texCoord);
-vec2 dcdy = dFdy(texCoord);
-#endif
 
 vec3 lightVec = sunVec * ((timeAngle < 0.5325 || timeAngle > 0.9675) ? 1.0 : -1.0);
 
@@ -125,12 +107,6 @@ float GetHandItem(int id) {
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
 
-#ifdef ADVANCED_MATERIALS
-#include "/lib/util/encode.glsl"
-
-#include "/lib/surface/directionalLightmap.glsl"
-
-#endif
 
 #ifdef MULTICOLORED_BLOCKLIGHT
 #include "/lib/util/voxelMapHelper.glsl"
@@ -152,18 +128,6 @@ void main() {
 	float smoothness = 0.0;
 	vec3 lightAlbedo = vec3(0.0);
 
-	#ifdef ADVANCED_MATERIALS
-	vec2 newCoord = vTexCoord.st * vTexCoordAM.pq + vTexCoordAM.st;
-	float surfaceDepth = 1.0;
-	#if MC_VERSION >= 11300
-	float skipParallax = float(heldId == 4 || (heldId2 == 4 && isMainHand  < 0.5));
-	#else
-	float skipParallax = float(heldId == 358 || (heldId2 == 358 && isMainHand  < 0.5));
-	#endif
-
-	float skyOcclusion = 0.0;
-	vec3 fresnel3 = vec3(0.0);
-	#endif
 
 	{
 		#ifdef TOON_LIGHTMAP
@@ -191,22 +155,6 @@ void main() {
 		vec3 viewPos = ToNDC(screenPos);
 		vec3 worldPos = ToWorld(viewPos);
 
-		#ifdef ADVANCED_MATERIALS
-		float f0 = 0.04, porosity = 0.0, ao = 1.0;
-		vec3 normalMap = vec3(0.0, 0.0, 1.0);
-		smoothness = 0.0;
-
-		#ifdef NORMAL_SKIP
-		normalMap = vec3(0.0, 0.0, 1.0);
-		#endif
-		
-		mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
-							  tangent.y, binormal.y, normal.y,
-							  tangent.z, binormal.z, normal.z);
-
-		if ((normalMap.x > -0.999 || normalMap.y > -0.999) && viewVector == viewVector)
-			newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-		#endif
 		
 		#if DYNAMIC_HANDLIGHT > 0
 		lightmap = ApplyDynamicHandlightHand(lightmap);
@@ -256,28 +204,6 @@ void main() {
 			  vanillaDiffuse*= vanillaDiffuse;
 
 		float parallaxShadow = 1.0;
-		#ifdef ADVANCED_MATERIALS
-		vec3 rawAlbedo = albedo.rgb * 0.999 + 0.001;
-		albedo.rgb *= ao * ao;
-
-		#ifdef REFLECTION_SPECULAR
-		albedo.rgb *= 1.0;
-		#endif
-
-		float doParallax = 0.0;
-		#ifdef SELF_SHADOW
-		#ifdef OVERWORLD
-		doParallax = float(lightmap.y > 0.0 && NoL > 0.0);
-		#endif
-		#ifdef END
-		doParallax = float(NoL > 0.0);
-		#endif
-		
-		if (doParallax > 0.5 && skipParallax < 0.5) {
-			parallaxShadow = GetParallaxShadow(surfaceDepth, 0.0, newCoord, lightVec, tbnMatrix);
-		}
-		#endif
-		#endif
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, vec3(0.0), newNormal, 1.0);
@@ -287,34 +213,9 @@ void main() {
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, vec3(0.0), lightmap, 1.0, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
-		#ifdef ADVANCED_MATERIALS
-		skyOcclusion = lightmap.y;
-
-		baseReflectance = vec3(f0);
-		float fresnel = pow(clamp(1.0 + dot(newNormal, normalize(viewPos.xyz)), 0.0, 1.0), 5.0);
-
-		fresnel3 = mix(baseReflectance, vec3(1.0), fresnel);
-		#if MATERIAL_FORMAT == 1
-		if (f0 >= 0.9 && f0 < 1.0) {
-			baseReflectance = GetMetalCol(f0);
-			fresnel3 = mix(baseReflectance, vec3(1.0), fresnel);
-			#ifdef ALBEDO_METAL
-			fresnel3 *= rawAlbedo;
-			#endif
-		}
-		#endif
-		
-		float aoSquared = ao * ao;
-		shadow *= aoSquared; fresnel3 *= aoSquared;
-		albedo.rgb = albedo.rgb * (1.0 - fresnel3 * smoothness * smoothness);
-		#endif
 
 
 
-		#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR && defined REFLECTION_ROUGH
-		normalMap = mix(vec3(0.0, 0.0, 1.0), normalMap, smoothness);
-		newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-		#endif
 
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
@@ -326,12 +227,6 @@ void main() {
 	gl_FragData[1] = vec4(lightAlbedo, 1.0);
 
 
-	#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-		/* DRAWBUFFERS:08367 */
-		gl_FragData[2] = vec4(smoothness, skyOcclusion, 0.25, 1.0);
-		gl_FragData[3] = vec4(EncodeNormal(newNormal), float(gl_FragCoord.z < 1.0), 1.0);
-		gl_FragData[4] = vec4(fresnel3, 1.0);
-	#endif
 }
 
 #endif
@@ -349,14 +244,6 @@ varying vec3 sunVec, upVec, eastVec;
 
 varying vec4 color;
 
-#ifdef ADVANCED_MATERIALS
-varying float dist;
-
-varying vec3 binormal, tangent;
-varying vec3 viewVector;
-
-varying vec4 vTexCoord, vTexCoordAM;
-#endif
 
 //Uniforms//
 uniform bool isRightHanded;
@@ -373,10 +260,6 @@ uniform mat4 gbufferProjection;
 //Attributes//
 attribute vec4 mc_Entity;
 
-#ifdef ADVANCED_MATERIALS
-attribute vec4 mc_midTexCoord;
-attribute vec4 at_tangent;
-#endif
 
 
 //Common Variables//
@@ -393,26 +276,6 @@ void main() {
 
 	normal = normalize(gl_NormalMatrix * gl_Normal);
 
-	#ifdef ADVANCED_MATERIALS
-	binormal = normalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w);
-	tangent  = normalize(gl_NormalMatrix * at_tangent.xyz);
-	
-	mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
-						  tangent.y, binormal.y, normal.y,
-						  tangent.z, binormal.z, normal.z);
-								  
-	viewVector = tbnMatrix * (gl_ModelViewMatrix * gl_Vertex).xyz;
-	
-	dist = length(gl_ModelViewMatrix * gl_Vertex);
-
-	vec2 midCoord = (gl_TextureMatrix[0] *  mc_midTexCoord).st;
-	vec2 texMinMidCoord = texCoord - midCoord;
-
-	vTexCoordAM.pq  = abs(texMinMidCoord) * 2;
-	vTexCoordAM.st  = min(texCoord, midCoord - texMinMidCoord);
-	
-	vTexCoord.xy    = sign(texMinMidCoord) * 0.5 + 0.5;
-	#endif
     
 	color = gl_Color;
 

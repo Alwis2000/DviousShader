@@ -10,7 +10,6 @@ float cdist(vec2 coord) {
 	return max(abs(coord.x - 0.5), abs(coord.y - 0.5)) * 1.85;
 }
 
-#if WATER_NORMALS == 0
 #if REFLECTION_MODE == 0
 float errMult = 1.0;
 #elif REFLECTION_MODE == 1
@@ -18,24 +17,12 @@ float errMult = 1.8;
 #else
 float errMult = 2.2;
 #endif
-#else
-#if REFLECTION_MODE == 0
-float errMult = 1.0;
-#elif REFLECTION_MODE == 1
-float errMult = 1.3;
-#else
-float errMult = 1.6;
-#endif
-#endif
 
 vec4 Raytrace(sampler2D depthtex, vec3 viewPos, vec3 normal, float dither, out float border, 
 			  int maxf, float stp, float ref, float inc) {
 	vec3 pos = vec3(0.0);
 	float dist = 0.0;
 	
-	#ifdef TAA
-	dither = fract(dither + frameCounter * (TAA_MODE == 0 ? 0.618 : 0.5));
-	#endif
 
 	vec3 start = viewPos + normal * 0.075;
 

@@ -7,9 +7,6 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
                  float parallaxShadow, float emission, float isEntity) {
     smoothLighting = 1.0;
 
-    #if EMISSIVE == 0 || (!defined ADVANCED_MATERIALS && EMISSIVE == 1)
-    emission = 0.0;
-    #endif
 
     float skylightSqr = lightmap.y * lightmap.y;
 

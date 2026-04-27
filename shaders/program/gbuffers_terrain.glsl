@@ -19,14 +19,6 @@ varying vec3 sunVec, upVec, eastVec;
 
 varying vec4 color;
 
-#ifdef ADVANCED_MATERIALS
-varying float dist;
-
-varying vec3 binormal, tangent;
-varying vec3 viewVector;
-
-varying vec4 vTexCoord, vTexCoordAM;
-#endif
 
 #ifdef IRIS_FEATURE_FADE_VARIABLE
 varying float chunkFade;
@@ -64,14 +56,6 @@ uniform sampler2D texture;
 
 uniform sampler2D noisetex;
 
-#ifdef ADVANCED_MATERIALS
-uniform ivec2 atlasSize;
-
-uniform sampler2D specular;
-uniform sampler2D normals;
-
-
-#endif
 
 #if DYNAMIC_HANDLIGHT > 0
 uniform int heldBlockLightValue, heldBlockLightValue2;
@@ -106,10 +90,6 @@ float time = float(worldTime) * 0.05 * ANIMATION_SPEED;
 float time = frameTimeCounter * ANIMATION_SPEED;
 #endif
 
-#ifdef ADVANCED_MATERIALS
-vec2 dcdx = dFdx(texCoord);
-vec2 dcdy = dFdy(texCoord);
-#endif
 
 vec3 lightVec = sunVec * ((timeAngle < 0.5325 || timeAngle > 0.9675) ? 1.0 : -1.0);
 
@@ -135,18 +115,7 @@ float GetLuminance(vec3 color) {
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
-#ifdef ADVANCED_MATERIALS
-#include "/lib/util/encode.glsl"
-
-#include "/lib/surface/directionalLightmap.glsl"
-
-
-
-#endif
 
 #ifdef MULTICOLORED_BLOCKLIGHT
 #include "/lib/util/voxelMapHelper.glsl"
@@ -163,18 +132,6 @@ void main() {
 	float smoothness = 0.0;
 	vec3 lightAlbedo = vec3(0.0);
 
-	#ifdef ADVANCED_MATERIALS
-	vec2 newCoord = vTexCoord.st * vTexCoordAM.pq + vTexCoordAM.st;
-	float surfaceDepth = 1.0;
-	float parallaxFade = clamp((dist - PARALLAX_DISTANCE) / 32.0, 0.0, 1.0);
-	float skipParallax = float(mat > 3.98 && mat < 4.02);
-		  skipParallax+= float(mat > 7.98 && mat < 8.02);
-	
-
-
-	float skyOcclusion = 0.0;
-	vec3 fresnel3 = vec3(0.0);
-	#endif
 
 	{
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
@@ -198,11 +155,7 @@ void main() {
 		#endif
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
-		#ifdef TAA
-		vec3 viewPos = ToNDC(vec3(TAAJitter(screenPos.xy, -0.5), screenPos.z));
-		#else
 		vec3 viewPos = ToNDC(screenPos);
-		#endif
 		vec3 worldPos = ToWorld(viewPos);
 		
 		#if defined DISTANT_HORIZONS && !defined VOXY
@@ -215,18 +168,6 @@ void main() {
 		}
 		#endif
 
-		#ifdef ADVANCED_MATERIALS
-		float f0 = 0.04, porosity = 0.0, ao = 1.0;
-		vec3 normalMap = vec3(0.0, 0.0, 1.0);
-		smoothness = 0.0;
-
-		mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
-							  tangent.y, binormal.y, normal.y,
-							  tangent.z, binormal.z, normal.z);
-
-		if ((normalMap.x > -0.999 || normalMap.y > -0.999) && viewVector == viewVector)
-			newNormal = clamp(normalize(normalMap * tbnMatrix), vec3(-1.0), vec3(1.0));
-		#endif
 		
 		#if DYNAMIC_HANDLIGHT == 2
 		lightmap = ApplyDynamicHandlight(lightmap, worldPos);
@@ -276,9 +217,6 @@ void main() {
 		if (foliage > 0.5){
 			newNormal = upVec;
 			
-			#ifdef ADVANCED_MATERIALS
-			newNormal = normalize(mix(outNormal, newNormal, normalMap.z * normalMap.z));
-			#endif
 		}
 		#endif
 		
@@ -296,36 +234,6 @@ void main() {
 		#endif
 
 		float parallaxShadow = 1.0;
-		#ifdef ADVANCED_MATERIALS
-		vec3 rawAlbedo = albedo.rgb * 0.999 + 0.001;
-		albedo.rgb *= ao * ao;
-
-		#ifdef REFLECTION_SPECULAR
-		albedo.rgb *= 1.0;
-		#endif
-
-		float doParallax = 0.0;
-		#ifdef SELF_SHADOW
-		float parallaxNoL = dot(outNormal, lightVec);
-		#ifdef OVERWORLD
-		doParallax = float(lightmap.y > 0.0 && parallaxNoL > 0.0);
-		#endif
-		#ifdef END
-		doParallax = float(parallaxNoL > 0.0);
-		#endif
-		
-		if (doParallax > 0.5 && skipParallax < 0.5) {
-			parallaxShadow = GetParallaxShadow(surfaceDepth, parallaxFade, newCoord, lightVec,
-											   tbnMatrix);
-		}
-		#endif
-
-		#ifdef DIRECTIONAL_LIGHTMAP
-		mat3 lightmapTBN = GetLightmapTBN(viewPos);
-		lightmap.x = DirectionalLightmap(lightmap.x, lmCoord.x, outNormal, lightmapTBN);
-		lightmap.y = DirectionalLightmap(lightmap.y, lmCoord.y, outNormal, lightmapTBN);
-		#endif
-		#endif
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0);
@@ -342,40 +250,9 @@ void main() {
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
-		#ifdef ADVANCED_MATERIALS
-
-
-		skyOcclusion = lightmap.y;
-		
-		baseReflectance = vec3(f0);
-		float fresnel = pow(clamp(1.0 + dot(outNormal, normalize(viewPos.xyz)), 0.0, 1.0), 5.0);
-
-		fresnel3 = mix(baseReflectance, vec3(1.0), fresnel);
-		#if MATERIAL_FORMAT == 1
-		if (f0 >= 0.9 && f0 < 1.0) {
-			baseReflectance = GetMetalCol(f0);
-			fresnel3 = mix(baseReflectance, vec3(1.0), fresnel);
-			#ifdef ALBEDO_METAL
-			fresnel3 *= rawAlbedo;
-			#endif
-		}
-		#endif
-		
-		float aoSquared = ao * ao;
-		shadow *= aoSquared; fresnel3 *= aoSquared;
-		albedo.rgb = albedo.rgb * (1.0 - fresnel3 * smoothness * smoothness);
-		#endif
 
 
 		
-		#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR && defined REFLECTION_ROUGH
-		newNormal = outNormal;
-		if ((normalMap.x > -0.999 || normalMap.y > -0.999) && viewVector == viewVector) {
-			normalMap = mix(vec3(0.0, 0.0, 1.0), normalMap, smoothness);
-			newNormal = mix(normalMap * tbnMatrix, newNormal, 1.0 - pow(1.0 - puddles, 4.0));
-			newNormal = clamp(normalize(newNormal), vec3(-1.0), vec3(1.0));
-		}
-		#endif
 		
 		#ifdef IRIS_FEATURE_FADE_VARIABLE
 		ChunkFade(albedo.rgb, viewPos, chunkFade);
@@ -386,18 +263,9 @@ void main() {
 		#endif
 	}
 
-	#if defined ADVANCED_MATERIALS && defined REFLECTION_SPECULAR
-		/* DRAWBUFFERS:08367 */
-		gl_FragData[0] = albedo;
-		gl_FragData[1] = vec4(lightAlbedo, 1.0);
-		gl_FragData[2] = vec4(smoothness, skyOcclusion, 0.0, 1.0);
-		gl_FragData[3] = vec4(EncodeNormal(newNormal), float(gl_FragCoord.z < 1.0), 1.0);
-		gl_FragData[4] = vec4(fresnel3, 1.0);
-	#else
 		/* DRAWBUFFERS:08 */
 		gl_FragData[0] = albedo;
 		gl_FragData[1] = vec4(lightAlbedo, 1.0);
-	#endif
 }
 
 #endif
@@ -415,14 +283,6 @@ varying vec3 sunVec, upVec, eastVec;
 
 varying vec4 color;
 
-#ifdef ADVANCED_MATERIALS
-varying float dist;
-
-varying vec3 binormal, tangent;
-varying vec3 viewVector;
-
-varying vec4 vTexCoord, vTexCoordAM;
-#endif
 
 #ifdef IRIS_FEATURE_FADE_VARIABLE
 varying float chunkFade;
@@ -439,19 +299,11 @@ uniform vec3 relativeEyePosition;
 
 uniform mat4 gbufferModelView, gbufferModelViewInverse;
 
-#ifdef TAA
-uniform int frameCounter;
-
-uniform float viewWidth, viewHeight;
-#endif
 
 //Attributes//
 attribute vec4 mc_Entity;
 attribute vec4 mc_midTexCoord;
 
-#ifdef ADVANCED_MATERIALS
-attribute vec4 at_tangent;
-#endif
 
 //Common Variables//
 #ifdef WORLD_TIME_ANIMATION
@@ -463,9 +315,6 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 //Includes//
 #include "/lib/vertex/waving.glsl"
 
-#ifdef TAA
-#include "/lib/util/jitter.glsl"
-#endif
 
 
 
@@ -480,29 +329,6 @@ void main() {
 
 	normal = normalize(gl_NormalMatrix * gl_Normal);
 
-	#ifdef ADVANCED_MATERIALS
-	binormal = normalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w);
-	tangent  = normalize(gl_NormalMatrix * at_tangent.xyz);
-	
-	mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
-						  tangent.y, binormal.y, normal.y,
-						  tangent.z, binormal.z, normal.z);
-								  
-	viewVector = tbnMatrix * (gl_ModelViewMatrix * gl_Vertex).xyz;
-
-	if (mc_Entity.x == 0)
-		viewVector /= 0.0;
-	
-	dist = length(gl_ModelViewMatrix * gl_Vertex);
-
-	vec2 midCoord = (gl_TextureMatrix[0] *  mc_midTexCoord).st;
-	vec2 texMinMidCoord = texCoord - midCoord;
-
-	vTexCoordAM.pq  = abs(texMinMidCoord) * 2;
-	vTexCoordAM.st  = min(texCoord, midCoord - texMinMidCoord);
-	
-	vTexCoord.xy    = sign(texMinMidCoord) * 0.5 + 0.5;
-	#endif
     
 	color = gl_Color;
 	
@@ -567,9 +393,6 @@ void main() {
 
 	gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
 	
-	#ifdef TAA
-	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);
-	#endif
 }
 
 #endif
