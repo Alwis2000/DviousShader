@@ -1,0 +1,4 @@
+#define DH_BLOCK_WATER 1
+#define DH_BLOCK_LEAVES 2
+#define DH_BLOCK_ILLUMINATED 3
+#define DH_BLOCK_LAVA 4
