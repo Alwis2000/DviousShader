@@ -141,9 +141,10 @@ vec3 GetWaterNormal(vec3 worldPos, vec3 viewPos, vec3 viewVector, vec3 normal) {
 #include "/lib/util/spaceConversion.glsl"
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
-#include "/lib/atmospherics/clouds.glsl"
+
 #include "/lib/atmospherics/fog.glsl"
 #include "/lib/atmospherics/waterFog.glsl"
+#include "/lib/atmospherics/stars.glsl"
 #include "/lib/lighting/forwardLighting.glsl"
 
 #include "/lib/reflections/raytrace.glsl"
@@ -174,7 +175,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	vec3 vlAlbedo = vec3(1.0);
 	vec3 refraction = vec3(0.0);
 
-	float cloudBlendOpacity = 1.0;
+
 
 	{
 		vec2 lightmap = clamp((parameters.lightMap - 0.03125) * 1.06667, vec2(0.0), vec2(0.9333, 1.0));
@@ -336,17 +337,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 				skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12);
 				#endif
 
-				#if CLOUDS == 1
-				vec4 cloud = DrawCloudSkybox(skyRefPos * 100.0, 1.0, dither, lightCol, ambientCol, true);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a);
-				#endif
-				#if CLOUDS == 2
-				vec3 cameraPos = GetReflectedCameraPos(worldPos, newNormal);
-				float cloudViewLength = 0.0;
 
-				vec4 cloud = DrawCloudVolumetric(skyRefPos * 8192.0, cameraPos, 1.0, dither, lightCol, ambientCol, cloudViewLength, true);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a);
-				#endif
 
 				#ifdef CLASSIC_EXPOSURE
 				skyReflection *= 4.0 - 3.0 * eBS;
@@ -400,7 +391,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#endif
 
 	}
-	albedo.a *= cloudBlendOpacity;
+
 
 	gbufferData0 = albedo;
 	gbufferData1 = vec4(vlAlbedo, 1.0);

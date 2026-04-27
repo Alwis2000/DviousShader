@@ -245,9 +245,7 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 #include "/lib/util/jitter.glsl"
 #endif
 
-#ifdef WORLD_CURVATURE
-#include "/lib/vertex/worldCurvature.glsl"
-#endif
+
 
 //Program//
 void main() {
@@ -276,13 +274,7 @@ void main() {
 	upVec = normalize(gbufferModelView[1].xyz);
 	eastVec = normalize(gbufferModelView[0].xyz);
 
-    #ifdef WORLD_CURVATURE
-	vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
-	position.y -= WorldCurvature(position.xz);
-	gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
-	#else
 	gl_Position = ftransform();
-    #endif
 	
 	#ifdef TAA
 	gl_Position.xy = TAAJitter(gl_Position.xy, gl_Position.w);

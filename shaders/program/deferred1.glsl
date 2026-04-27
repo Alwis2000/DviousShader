@@ -201,7 +201,8 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
 #include "/lib/atmospherics/fog.glsl"
-// #include "/lib/atmospherics/clouds.glsl"
+#include "/lib/atmospherics/stars.glsl"
+
 #include "/lib/atmospherics/sunmoon.glsl"
 
 #ifdef OUTLINE_ENABLED
@@ -334,30 +335,11 @@ void main() {
 				vec3 skyRefPos = reflect(normalize(viewPos.xyz), normal);
 				skyReflection = GetSkyColor(skyRefPos, true);
 
-				#ifdef REFLECTION_ROUGH
-				float cloudMixRate = smoothness * smoothness * (3.0 - 2.0 * smoothness);
-				#else
-				float cloudMixRate = 1.0;
-				#endif
-
 				#if AURORA > 0
-				skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12) * cloudMixRate;
+				skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12);
 				#endif
 
-				#if CLOUDS == 1
-				vec4 cloud = DrawCloudSkybox(skyRefPos * 100.0, 1.0, dither, lightCol, ambientCol, false);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a * cloudMixRate);
-				#endif
-				#if CLOUDS == 2
-				vec4 worldPos = gbufferModelViewInverse * vec4(viewPos.xyz, 1.0);
-				worldPos.xyz /= worldPos.w;
 
-				vec3 cameraPos = GetReflectedCameraPos(worldPos.xyz, normal);
-				float cloudViewLength = 0.0;
-
-				vec4 cloud = DrawCloudVolumetric(skyRefPos * 8192.0, cameraPos, 1.0, dither, lightCol, ambientCol, cloudViewLength, true);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a * cloudMixRate);
-				#endif
 
 				float NoU = clamp(dot(normal, upVec), -1.0, 1.0);
 				float NoE = clamp(dot(normal, eastVec), -1.0, 1.0);
@@ -465,40 +447,7 @@ void main() {
 		if (blindFactor > 0.0 || darknessFactor > 0.0) color.rgb *= 1.0 - max(blindFactor, darknessFactor);
 	}
 
-	vec4 cloud = vec4(0.0);
-	float cloudDither = BayerCloud8(gl_FragCoord.xy);
 
-	float cloudMaxDistance = 2.0 * far;
-	#ifdef VOXY
-	cloudMaxDistance = max(cloudMaxDistance, vxRenderDistance * 16.0);
-	#endif
-	#ifdef DISTANT_HORIZONS
-	cloudMaxDistance = max(cloudMaxDistance, dhFarPlane);
-	#endif
-	float cloudViewLength = cloudMaxDistance;
-
-	float cloudSampleZ = z;
-
-	#ifdef OVERWORLD
-	#if CLOUDS == 1
-	cloud = DrawCloudSkybox(viewPos.xyz, cloudSampleZ, cloudDither, lightCol, ambientCol, false);
-	#endif
-
-	#if CLOUDS == 2
-	cloud = DrawCloudVolumetric(viewPos.xyz, cameraPosition, cloudSampleZ, cloudDither, lightCol, ambientCol, cloudViewLength, false);
-	#endif
-
-	if (isEyeInWater > 1) cloud.a = 0.0;
-
-	#ifndef LIGHT_SHAFT
-	SunGlare(cloud.rgb, viewPos.xyz, lightCol);
-	#endif
-
-	cloud.rgb *= 1.0 - max(blindFactor, darknessFactor);
-
-	color.rgb = mix(color.rgb, cloud.rgb, cloud.a);
-	#endif
-	cloudViewLength /= cloudMaxDistance;
 
 	vec3 reflectionColor = pow(color.rgb, vec3(0.125)) * 0.5;
 
@@ -515,12 +464,6 @@ void main() {
 	vec4 vxScreenPos0 = vec4(texCoord, vxZ0, 1.0);
 	vec4 vxViewPos0 = vxProjInv * (vxScreenPos0 * 2.0 - 1.0);
 	vxViewPos0 /= vxViewPos0.w;
-
-	voxyTransparentColor.a *= step(-vxViewPos0.z, -viewPos.z);
-	if (cloudViewLength < 1.0) {
-		float vxViewLength0 = length(vxViewPos0.xyz);
-		voxyTransparentColor.a *= step(vxViewLength0, cloudViewLength * cloudMaxDistance);
-	}
 
 	color.rgb = mix(color.rgb, voxyTransparentColor.rgb, voxyTransparentColor.a);
 	#endif

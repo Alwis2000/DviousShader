@@ -73,7 +73,8 @@ float GetLuminance(vec3 color) {
 #include "/lib/color/skyColor.glsl"
 #include "/lib/util/dither.glsl"
 #include "/lib/atmospherics/weatherDensity.glsl"
-#include "/lib/atmospherics/clouds.glsl"
+#include "/lib/atmospherics/stars.glsl"
+
 #include "/lib/atmospherics/sky.glsl"
 #include "/lib/atmospherics/sunmoon.glsl"
 

@@ -56,9 +56,7 @@ uniform sampler2D depthtex1;
 uniform sampler2D noisetex;
 uniform sampler2D dhDepthTex1;
 
-#if CLOUDS == 2
-uniform sampler2D gaux1;
-#endif
+
 
 #ifdef VOXY
 uniform int vxRenderDistance;
@@ -169,7 +167,8 @@ vec3 GetWaterNormal(vec3 worldPos, vec3 viewPos, vec3 viewVector) {
 #include "/lib/util/spaceConversion.glsl"
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
-#include "/lib/atmospherics/clouds.glsl"
+#include "/lib/atmospherics/stars.glsl"
+
 #include "/lib/atmospherics/fog.glsl"
 #include "/lib/atmospherics/waterFog.glsl"
 #include "/lib/lighting/forwardLighting.glsl"
@@ -197,7 +196,7 @@ void main() {
 	vec3 vlAlbedo = vec3(1.0);
 	vec3 refraction = vec3(0.0);
 
-	float cloudBlendOpacity = 1.0;
+
 
 	{
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
@@ -233,24 +232,7 @@ void main() {
 			discard;
 		}
 
-		#if CLOUDS == 2
-		float cloudMaxDistance = 2.0 * far;
-		#ifdef VOXY
-		cloudMaxDistance = max(cloudMaxDistance, vxRenderDistance * 16.0);
-		#endif
-		#ifdef DISTANT_HORIZONS
-		cloudMaxDistance = max(cloudMaxDistance, dhFarPlane);
-		#endif
 
-		float cloudViewLength = texture2D(gaux1, screenPos.xy).r * cloudMaxDistance;
-
-		cloudBlendOpacity = step(viewLength, cloudViewLength);
-
-		if (cloudBlendOpacity == 0) {
-			discard;
-		}
-		// albedo.rgb *= fract(viewLength);
-		#endif
 
 		vec3 normalMap = vec3(0.0, 0.0, 1.0);
 		
@@ -353,17 +335,7 @@ void main() {
 				skyReflection += DrawAurora(skyRefPos * 100.0, dither, 12);
 				#endif
 
-				#if CLOUDS == 1
-				vec4 cloud = DrawCloudSkybox(skyRefPos * 100.0, 1.0, dither, lightCol, ambientCol, true);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a);
-				#endif
-				#if CLOUDS == 2
-				vec3 cameraPos = GetReflectedCameraPos(worldPos, newNormal);
-				float cloudViewLength = 0.0;
 
-				vec4 cloud = DrawCloudVolumetric(skyRefPos * 8192.0, cameraPos, 1.0, dither, lightCol, ambientCol, cloudViewLength, true);
-				skyReflection = mix(skyReflection, cloud.rgb, cloud.a);
-				#endif
 
 				#ifdef CLASSIC_EXPOSURE
 				skyReflection *= 4.0 - 3.0 * eBS;
@@ -430,7 +402,7 @@ void main() {
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
 		#endif
 	}
-	albedo.a *= cloudBlendOpacity;
+
 
     /* DRAWBUFFERS:01 */
     gl_FragData[0] = albedo;
@@ -501,9 +473,7 @@ float WavingWater(vec3 worldPos) {
 #include "/lib/util/jitter.glsl"
 #endif
 
-#ifdef WORLD_CURVATURE
-#include "/lib/vertex/worldCurvature.glsl"
-#endif
+
 
 //Program//
 void main() {
@@ -558,9 +528,7 @@ void main() {
 	// if (blockID == 200 || blockID == 202 || blockID == 204) position.y += WavingWater(position.xyz);
 	// #endif
 
-    #ifdef WORLD_CURVATURE
-	position.y -= WorldCurvature(position.xz);
-    #endif
+
 
 	gl_Position = dhProjection * gbufferModelView * position;
 	if (mat == 0.0) gl_Position.z -= 0.00001;

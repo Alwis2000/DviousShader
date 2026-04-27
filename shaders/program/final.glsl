@@ -24,7 +24,7 @@ const int colortex0Format = R11F_G11F_B10F; //main scene
 const int colortex1Format = RGB8; //raw translucent, vl, bloom, final scene
 const int colortex2Format = RGBA16; //temporal data
 const int colortex3Format = RGB8; //smoothness, sky occlusion, entity mask
-const int gaux1Format = R8; //cloud distance, ao
+const int gaux1Format = R8; //ao
 const int gaux2Format = RGB10_A2; //reflection image
 const int gaux3Format = RGBA16; //opaque normals, refraction vector
 const int gaux4Format = RGBA16; //fresnel, dirty lens
@@ -34,7 +34,7 @@ const int colortex9Format = RGB16F; //colored light
 const int colortex16Format = RGBA16F;
 */
 
-const bool shadowHardwareFiltering = true;
+const bool shadowHardwareFiltering = false;
 const float shadowDistanceRenderMul = 1.0;
 const float voxelDistance = 32.0;
 

@@ -31,20 +31,20 @@ Please don't edit anything from Undefine section and onwards.
   #define SHADOW
   const int shadowMapResolution = 2048;
   const float shadowDistance = 128.0;
-  const float shadowMapBias = 0.8;
+  const float shadowMapBias = 0.85;
   //#define SHADOW_FILTER
   #define SHADOW_COLOR
 
   #define SHADOW_ENTITY
   #define SHADOW_BLOCK_ENTITY
   //#define SHADOW_VEGETATION
-  //#define SHADOW_CLOUD
+
   #define SHADOW_LOD
   const float sunPathRotation = -40.0;
   #define SHADOW_BIAS 0
   #define SHADOW_PIXEL 16
   #define SHADOW_SKY_FALLOFF 0.7333
-  #define CONTACT_SHADOWS 0
+  // #define CONTACT_SHADOWS 0
 
 //#define AO
   #define MULTICOLORED_BLOCKLIGHT
@@ -114,20 +114,7 @@ Please don't edit anything from Undefine section and onwards.
   #define ALBEDO_BALANCING
   #define ALPHA_BLEND 0 //[0 1]
 
-// //Environment//
-//   #define CLOUDS 2 //[0 1 2 3]
-//   #define CLOUD_BASE 0 //[0 1 2]
-//   #define CLOUD_DENSITY 4 //[1 2 4 6 8]
-//   #define CLOUD_AMOUNT 10.0 //[12.0 11.0 10.0 9.0 8.0]
-//   #define CLOUD_HEIGHT -1 // [-1 -64 -48 -32 -16 0 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304 320]
-//   #define CLOUD_SCALE 12.0 //[4.0 6.0 8.0 10.0 12.0 14.0 16.0]
-//   #define CLOUD_STRETCH 1.0 //[2.0 1.4 1.0 0.7 0.5]
-//   #define CLOUD_THICKNESS 5 //[2 4 5 7 10]
-//   #define CLOUD_DETAIL 1.0 //[0.3 0.7 1.0 1.3 1.7]
-//   #define CLOUD_SPEED 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00]
-//   #define CLOUD_OPACITY 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-//   #define CLOUD_BRIGHTNESS 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
-  #define CLOUD_REVEAL
+
 
   #define FOG_DENSITY 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
   #define FOG_DENSITY_NETHER 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
@@ -149,7 +136,7 @@ Please don't edit anything from Undefine section and onwards.
 
   #define FAR_VANILLA_FOG_STYLE 0 //[0 1]
   #define FOG_DENSITY_VANILLA 1.00 //[0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
-  #define FOG_VANILLA_CLOUD 4 //[0 1 2 3 4]
+
   
   #define SKY_DENSITY_D 0.65 //[0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
   #define SKY_EXPOSURE_D 0.00 //[0.00 0.04 0.08 0.12 0.16 0.20 0.24 0.28 0.32 0.36 0.40 0.44 0.48 0.52 0.56 0.60 0.64 0.68 0.72 0.76 0.80 0.84 0.88 0.92 0.96 1.00]
@@ -499,8 +486,7 @@ Please don't edit anything from Undefine section and onwards.
   #define OUTLINE_WIDTH 4.0 // [0.5 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]
 //#define TOON_LIGHTMAP
 
-//#define WORLD_CURVATURE
-  #define WORLD_CURVATURE_SIZE 256 //[-256 -512 -1024 -2048 -4096 -8192 -16384 16384 8192 4096 2048 1024 512 256 128 64 32 16]
+
 //#define WHITE_WORLD
 
 //Undefine//
@@ -569,41 +555,8 @@ Please don't edit anything from Undefine section and onwards.
 #ifndef CLOUDS
   #define CLOUDS 0
 #endif
-#ifndef CLOUD_THICKNESS
-  #define CLOUD_THICKNESS 5
-#endif
-#ifndef CLOUD_AMOUNT
-  #define CLOUD_AMOUNT 10.0
-#endif
-#ifndef CLOUD_DENSITY
-  #define CLOUD_DENSITY 4
-#endif
-#ifndef CLOUD_DETAIL
-  #define CLOUD_DETAIL 1.0
-#endif
-#ifndef CLOUD_STRETCH
-  #define CLOUD_STRETCH 1.0
-#endif
-#ifndef CLOUD_SPEED
-  #define CLOUD_SPEED 1.0
-#endif
-#ifndef CLOUD_BRIGHTNESS
-  #define CLOUD_BRIGHTNESS 1.0
-#endif
-#ifndef SSS
-  //#define SSS
-#endif
-#ifndef BASIC_SSS
-  //#define BASIC_SSS
-#endif
 #ifndef REFRACTION
   #define REFRACTION 0
-#endif
-#ifndef PARALLAX
-  //#define PARALLAX
-#endif
-#ifndef SELF_SHADOW
-  //#define SELF_SHADOW
 #endif
 #ifndef WATER_PARALLAX
   //#define WATER_PARALLAX
@@ -654,4 +607,4 @@ Please don't edit anything from Undefine section and onwards.
 #endif
 #ifndef SHARPEN
   #define SHARPEN 0.0
-#endif
+#endif

@@ -89,7 +89,7 @@
 		"worldTime",
 
 		"blindFactor",
-		"cloudHeight",
+
 		"darknessFactor",
 		"endFlashIntensity",
 		"far",
@@ -124,9 +124,7 @@
 		#endif
 		#endif
 
-		#if CLOUDS == 2
-		"gaux1":"sampler2D",
-		#endif
+
 
 		#ifdef MCBL_SS
 		"colortex8":"sampler2D",

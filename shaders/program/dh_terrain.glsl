@@ -125,13 +125,7 @@ void main() {
 		float leaves   = float(mat > 1.98 && mat < 2.02);
 		float emissive = float(mat > 2.98 && mat < 3.02);
 		float lava     = float(mat > 3.98 && mat < 4.02);
-		float cloud   = float(mat > 4.98 && mat < 5.02);
 
-		#if CLOUDS != 3
-		if (cloud > 0.5) {
-			discard;
-		}
-		#endif
 
 		float emission        = emissive + lava;
 		vec3 baseReflectance  = vec3(0.04);
@@ -195,46 +189,14 @@ void main() {
 
 		
 		vec3 shadow = vec3(1.0);
-		if (cloud < 0.5) {
-			#ifdef SHADOW
-			GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
-						vanillaDiffuse, 1.0, emission, 0.0);
-			#else
-			// Fast path for DH when shadows are off
-			shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
-			albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
-			#endif
-		} else {
-			#ifdef OVERWORLD
-			albedo.rgb *= lightCol * vanillaDiffuse * CLOUD_BRIGHTNESS;
-			albedo.rgb *= mix(0.4 - 0.25 * rainStrength, 0.5 - 0.425 * rainStrength, sunVisibility);
-
-			vec3 sky = GetSkyColor(viewPos, false);
-			float cloudAlpha = 0.125;
-			
-			#if FOG_VANILLA_CLOUD > 0
-			#if FOG_VANILLA_CLOUD == 1
-			float vanillaFogEnd = 4.0;
-			#elif FOG_VANILLA_CLOUD == 2
-			float vanillaFogEnd = 2.0;
-			#elif FOG_VANILLA_CLOUD == 3
-			float vanillaFogEnd = 1.0;
-			#else
-			#if MC_VERSION > 12106
-			float vanillaFogEnd = 4.0;
-			#else
-			float vanillaFogEnd = 1.0;
-			#endif
-			#endif
-
-			float worldDistance = length(worldPos.xz) / 4096.0;
-			float vanillaFog = 1.0 - smoothstep(0.5, vanillaFogEnd, worldDistance);
-			cloudAlpha *= vanillaFog;
-			#endif
-
-			albedo.rgb = mix(sky, albedo.rgb, cloudAlpha);
-			#endif
-		}
+		#ifdef SHADOW
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+					vanillaDiffuse, 1.0, emission, 0.0);
+		#else
+		// Fast path for DH when shadows are off
+		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
+		albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
+		#endif
 
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
@@ -307,9 +269,7 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 #include "/lib/util/jitter.glsl"
 #endif
 
-#ifdef WORLD_CURVATURE
-#include "/lib/vertex/worldCurvature.glsl"
-#endif
+
 
 //Program//
 void main() {
@@ -361,11 +321,7 @@ void main() {
 		mat = 5.0;
 	}
 
-    #ifdef WORLD_CURVATURE
-	if (mat != 5.0) {
-		position.y -= WorldCurvature(position.xz);
-	}
-    #endif
+
 
 	gl_Position = dhProjection * gbufferModelView * position;
 	

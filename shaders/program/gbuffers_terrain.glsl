@@ -467,9 +467,7 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 #include "/lib/util/jitter.glsl"
 #endif
 
-#ifdef WORLD_CURVATURE
-#include "/lib/vertex/worldCurvature.glsl"
-#endif
+
 
 //Program//
 void main() {
@@ -565,9 +563,7 @@ void main() {
 	float istopv = gl_MultiTexCoord0.t < mc_midTexCoord.t ? 1.0 : 0.0;
 	position.xyz = WavingBlocks(position.xyz, blockID, istopv);
 
-    #ifdef WORLD_CURVATURE
-	position.y -= WorldCurvature(position.xz);
-    #endif
+
 
 	gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
 	

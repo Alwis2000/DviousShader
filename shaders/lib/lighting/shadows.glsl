@@ -1,12 +1,12 @@
 #ifdef SHADOW
 #ifndef VOXY_PATCH
-uniform sampler2DShadow shadowtex0;
-
-uniform sampler2DShadow shadowtex1;
+uniform sampler2D shadowtex0;
+uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 
-float texture2DShadow(sampler2DShadow shadowtex, vec3 shadowPos) {
-    return shadow2D(shadowtex, shadowPos).x;
+float texture2DShadow(sampler2D shadowtex, vec3 shadowPos) {
+    float depth = texture2D(shadowtex, shadowPos.xy).r;
+    return step(shadowPos.z, depth);
 }
 
 vec3 DistortShadow(vec3 shadowPos, float distortFactor) {
@@ -37,15 +37,19 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
 
     // Grid snapping for blocks (16x16 pixels per block)
     if (isEntity < 0.5) {
-        worldPos = (floor((worldPos + cameraPosition) * 16.0 + 0.01) + 0.1) * 0.0625 - cameraPosition;
-        worldPos += worldNormal * 0.05;
+        #if SHADOW_PIXEL > 0
+        worldPos = (floor((worldPos + cameraPosition) * float(SHADOW_PIXEL) + 0.01) + 0.1) / float(SHADOW_PIXEL) - cameraPosition;
+        #endif
+        worldPos += worldNormal * 0.01;
     }
 
     vec3 rawShadowPos = ToShadow(worldPos);
     
     // Snap distortion steps to the world grid for visual consistency
     float distb = length(rawShadowPos.xy);
-    distb = floor(distb * shadowDistance * 16.0 + 0.5) / (shadowDistance * 16.0);
+    #if SHADOW_PIXEL > 0
+    distb = floor(distb * shadowDistance * float(SHADOW_PIXEL) + 0.5) / (shadowDistance * float(SHADOW_PIXEL));
+    #endif
     float distortFactor = distb * shadowMapBias + (1.0 - shadowMapBias);
 
     vec3 shadowPos = DistortShadow(rawShadowPos, distortFactor);
@@ -69,9 +73,15 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
     float distortBias = distortFactor * shadowDistance / 256.0;
     bias = (distortBias * biasFactor * 0.1 + 0.01) / shadowMapResolution;
 
+    #if SHADOW_PIXEL > 0
+    if (isEntity > 1.5) bias += 0.01 / float(SHADOW_PIXEL);
+    else if (isEntity < 0.5) bias += 0.001 / float(SHADOW_PIXEL);
+    else bias += 0.001 / float(SHADOW_PIXEL);
+    #else
     if (isEntity > 1.5) bias += 0.05 / 16.0;
     else if (isEntity < 0.5) bias += 0.001 / 16.0;
     else bias += 0.001 / 16.0;
+    #endif
 
     shadowPos.z -= bias;
 
@@ -92,7 +102,3 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
     #endif
 }
 #endif
-
-float GetCloudShadow(vec3 worldPos) {
-	return 1.0;
-}

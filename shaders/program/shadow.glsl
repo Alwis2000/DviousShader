@@ -210,9 +210,7 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 //Includes//
 #include "/lib/vertex/waving.glsl"
 
-#ifdef WORLD_CURVATURE
-#include "/lib/vertex/worldCurvature.glsl"
-#endif
+
 
 #ifdef MULTICOLORED_BLOCKLIGHT
 #include "/lib/util/voxelMapHelper.glsl"
@@ -243,9 +241,7 @@ void main() {
 	float istopv = gl_MultiTexCoord0.t < mc_midTexCoord.t ? 1.0 : 0.0;
 	position.xyz = WavingBlocks(position.xyz, blockID, istopv);
 
-	#ifdef WORLD_CURVATURE
-	position.y -= WorldCurvature(position.xz);
-	#endif
+
 
 	#ifdef MULTICOLORED_BLOCKLIGHT
 	{

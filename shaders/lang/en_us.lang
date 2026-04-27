@@ -20,7 +20,7 @@ screen.NORMALS=Normals & Parallax
 screen.EMISSIVE=Emissive
 
 screen.ENVIRONMENT=Environment
-screen.CLOUDS=Clouds
+
 screen.FOG=Fog
 screen.FOG_DENSITY_MORE=More Fog Density Config
 screen.FOG_HEIGHT=Height Fog Config
@@ -155,8 +155,7 @@ option.SHADOW_BLOCK_ENTITY.comment=Enables shadow on block entities. §e[*]§rDi
 option.SHADOW_VEGETATION=Vegetation Shadow
 option.SHADOW_VEGETATION.comment=Enables shadow on grass, crops, and most other plants.
 
-option.SHADOW_CLOUD=Cloud Shadow
-option.SHADOW_CLOUD.comment=Enables shadow casted by clouds.
+
 
 option.SHADOW_LOD=LOD Shadow
 option.SHADOW_LOD.comment=Enables screen space shadow for Distant Horizons and Voxy.
@@ -364,7 +363,7 @@ value.DH_OVERDRAW.7.0=6 chunks
 value.DH_OVERDRAW.8.0=7 chunks
 value.DH_OVERDRAW.9.0=8 chunks
 
-#Cloud
+
 
 
 #Fog
@@ -428,13 +427,7 @@ value.FAR_VANILLA_FOG_STYLE.1=Cylindrical
 option.FOG_DENSITY_VANILLA=Vanilla Density
 option.FOG_DENSITY_VANILLA.comment=Adjusts fog density for vanilla fog.
 
-option.FOG_VANILLA_CLOUD=Vanilla Cloud Fog
-option.FOG_VANILLA_CLOUD.comment=Enables fog on vanilla cloud. Auto uses "Minimal" on 1.21.6 or above, otherwise "Full".
-value.FOG_VANILLA_CLOUD.0=§cOff
-value.FOG_VANILLA_CLOUD.1=Minimal
-value.FOG_VANILLA_CLOUD.2=Reduced
-value.FOG_VANILLA_CLOUD.3=Full
-value.FOG_VANILLA_CLOUD.4=Auto
+
 
 #Sky
 option.SKY_DENSITY_D=Day Density
@@ -913,11 +906,7 @@ option.TOON_LIGHTMAP.comment=Reduces the quality of vanilla lighting for cel sha
 
 
 
-option.WORLD_CURVATURE=World Curvature
-option.WORLD_CURVATURE.comment=Enables world curvature. §e[*]§rWorks in overworld only. §c[-]§rMissing chunks are handled by Minecraft itself which I can't fix. §c[-]§rMay break block selection highlight on 1.17. §c[-]§rNot compatible with Voxy.
 
-option.WORLD_CURVATURE_SIZE=World Curvature Size
-option.WORLD_CURVATURE_SIZE.comment=Adjusts world curvature size. Negative values will bend the world upwards.
 
 option.WHITE_WORLD=White World
 option.WHITE_WORLD.comment=Replaces textures with flat white color.

@@ -55,9 +55,7 @@ vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldP
 	vec3 worldNormal = mat3(gbufferModelViewInverse) * normal;
 	worldPos += worldNormal * 0.5;
 
-	#ifdef WORLD_CURVATURE
-	worldPos.y += dot(worldPos.xz, worldPos.xz) / WORLD_CURVATURE_SIZE;
-	#endif
+
 
 	vec3 voxelMapPos = WorldToVoxel(worldPos);
 	

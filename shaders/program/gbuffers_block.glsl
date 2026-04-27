@@ -173,16 +173,7 @@ vec3 DrawEndPortal(vec3 worldPos, vec3 worldNormal, float dither) {
 		portalCol += layerCol;
 	}
 
-	vec3 noiseColSqrt = vec3(END_R, END_G, END_B) / 255.0 * END_I;
-	vec3 noiseCol = noiseColSqrt * 0.1;
 
-	float noiseScale = (portalDepth + 32.0) / portalDepth;
-	vec2 noiseCoord = portalCoord * noiseScale + portalOffset;
-	noiseCoord /= 64.0;
-
-	float cloudNoise = texture2D(noisetex, noiseCoord + wind * 2.0).r;
-
-	portalCol += cloudNoise * noiseCol;
 
 	portalCol *= portalCol;
 	return portalCol;
