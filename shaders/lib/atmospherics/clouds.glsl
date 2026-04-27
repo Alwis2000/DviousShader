@@ -1,5 +1,33 @@
 #ifdef OVERWORLD
 
+#ifndef CLOUD_THICKNESS
+#define CLOUD_THICKNESS 5
+#endif
+#ifndef CLOUD_AMOUNT
+#define CLOUD_AMOUNT 10.0
+#endif
+#ifndef CLOUD_DENSITY
+#define CLOUD_DENSITY 4
+#endif
+#ifndef CLOUD_DETAIL
+#define CLOUD_DETAIL 1.0
+#endif
+#ifndef CLOUD_STRETCH
+#define CLOUD_STRETCH 1.0
+#endif
+#ifndef CLOUD_SPEED
+#define CLOUD_SPEED 1.0
+#endif
+#ifndef CLOUD_BRIGHTNESS
+#define CLOUD_BRIGHTNESS 1.0
+#endif
+#ifndef CLOUDS
+#define CLOUDS 0
+#endif
+#ifndef CLOUD_BASE
+#define CLOUD_BASE 0
+#endif
+
 float CloudSampleBasePerlin(vec2 coord) {
 	float noiseBase = texture2D(noisetex, coord).r;
 

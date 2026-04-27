@@ -44,45 +44,7 @@ const float drynessHalflife = 5.0;
 const float wetnessHalflife = 30.0;
 
 //Common Functions//
-// #ifdef TAA
-vec2 sharpenOffsets[4] = vec2[4](
-	vec2( 1.0,  0.0),
-	vec2( 0.0,  1.0),
-	vec2(-1.0,  0.0),
-	vec2( 0.0, -1.0)
-);
 
-void SharpenFilter(inout vec3 color, vec2 coord) {
-	#if SHARPEN == -1 && (defined FXAA && defined TAA)
-	float mult = 0.125;
-	#else
-	float mult = 0.0625 * SHARPEN;
-	#endif
-
-	vec2 view = 1.0 / vec2(viewWidth, viewHeight);
-
-	#ifdef SHARPEN_CLAMP
-	vec3 mincolor = color;
-	vec3 maxcolor = color;
-	#endif
-
-	color *= mult * 4.0 + 1.0;
-
-	for(int i = 0; i < 4; i++) {
-		vec2 offset = sharpenOffsets[i] * view;
-		vec3 colorSample = texture2DLod(colortex1, coord + offset, 0).rgb;
-		color -= colorSample * mult;
-
-		#ifdef SHARPEN_CLAMP
-		mincolor = min(mincolor, colorSample);
-		maxcolor = max(maxcolor, colorSample);
-		#endif
-	}
-
-	#ifdef SHARPEN_CLAMP
-	color = clamp(color, mincolor, maxcolor);
-	#endif
-}
 
 #ifdef SHADOW
 #endif
@@ -108,9 +70,7 @@ void main() {
 	color /= vec3(1.5,2.0,1.5);
 	#endif
 	
-	#ifdef SHARPEN_ENABLED
-	SharpenFilter(color, newTexCoord);
-	#endif
+
 
 	gl_FragColor = vec4(color, 1.0);
 }

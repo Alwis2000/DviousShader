@@ -82,21 +82,21 @@ Please don't edit anything from Undefine section and onwards.
 //#define REFLECTION_SKYBOX
   #define REFLECTION_SPECULAR
   #define REFLECTION_ROUGH
-  #define REFLECTION_RAIN
-  #define REFLECTION_RAIN_AMOUNT 1.0 //[0.4 0.5 0.6 0.7 1.0]
+  //#define REFLECTION_RAIN
+  //#define REFLECTION_RAIN_AMOUNT 1.0 //[0.4 0.5 0.6 0.7 1.0]
 //#define SPECULAR_HIGHLIGHT_ROUGH
 //#define ALBEDO_METAL
 
-  #define PARALLAX
-  #define PARALLAX_DEPTH 0.25 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50]
-  #define PARALLAX_QUALITY 128 //[16 32 64 128 256 512]
-  #define PARALLAX_DISTANCE 64 //[8 16 32 48 64 80 96 112 128]
-  #define PARALLAX_PORTAL
-  #define SELF_SHADOW
-  #define SELF_SHADOW_ANGLE 2.0 //[0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0]
-  #define SELF_SHADOW_QUALITY 8 //[8 16 32]
-  #define SELF_SHADOW_STRENGTH 16 //[4 8 16 32 64]
-//#define DIRECTIONAL_LIGHTMAP
+  // #define PARALLAX
+  // #define PARALLAX_DEPTH 0.25 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50]
+  // #define PARALLAX_QUALITY 128 //[16 32 64 128 256 512]
+  // #define PARALLAX_DISTANCE 64 //[8 16 32 48 64 80 96 112 128]
+  // #define PARALLAX_PORTAL
+//   #define SELF_SHADOW
+//   #define SELF_SHADOW_ANGLE 2.0 //[0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5 6.0 6.5 7.0 7.5 8.0]
+//   #define SELF_SHADOW_QUALITY 8 //[8 16 32]
+//   #define SELF_SHADOW_STRENGTH 16 //[4 8 16 32 64]
+// //#define DIRECTIONAL_LIGHTMAP
   #define DIRECTIONAL_LIGHTMAP_STRENGTH 1.0 //[2.0 1.4 1.0 0.7 0.5]
   #define NORMAL_DAMPENING
   #define NORMAL_PLANTS
@@ -107,26 +107,26 @@ Please don't edit anything from Undefine section and onwards.
   #define EMISSIVE_INTENSITY 2.0 //[1.0 1.4 2.0 2.8 4.0 5.6 8.0 11.2 16.0]
   #define EMISSIVE_CURVE 1.00 //[1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
 
-  #define SSS
-  #define BASIC_SSS
+  // #define SSS
+  // #define BASIC_SSS
   #define ENTITY_FLASH
-  #define REFRACTION 0 //[0 1 2]
+  // #define REFRACTION 0 //[0 1 2]
   #define ALBEDO_BALANCING
   #define ALPHA_BLEND 0 //[0 1]
 
-//Environment//
-  #define CLOUDS 2 //[0 1 2 3]
-  #define CLOUD_BASE 0 //[0 1 2]
-  #define CLOUD_DENSITY 4 //[1 2 4 6 8]
-  #define CLOUD_AMOUNT 10.0 //[12.0 11.0 10.0 9.0 8.0]
-  #define CLOUD_HEIGHT -1 // [-1 -64 -48 -32 -16 0 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304 320]
-  #define CLOUD_SCALE 12.0 //[4.0 6.0 8.0 10.0 12.0 14.0 16.0]
-  #define CLOUD_STRETCH 1.0 //[2.0 1.4 1.0 0.7 0.5]
-  #define CLOUD_THICKNESS 5 //[2 4 5 7 10]
-  #define CLOUD_DETAIL 1.0 //[0.3 0.7 1.0 1.3 1.7]
-  #define CLOUD_SPEED 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00]
-  #define CLOUD_OPACITY 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-  #define CLOUD_BRIGHTNESS 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
+// //Environment//
+//   #define CLOUDS 2 //[0 1 2 3]
+//   #define CLOUD_BASE 0 //[0 1 2]
+//   #define CLOUD_DENSITY 4 //[1 2 4 6 8]
+//   #define CLOUD_AMOUNT 10.0 //[12.0 11.0 10.0 9.0 8.0]
+//   #define CLOUD_HEIGHT -1 // [-1 -64 -48 -32 -16 0 16 32 48 64 80 96 112 128 144 160 176 192 208 224 240 256 272 288 304 320]
+//   #define CLOUD_SCALE 12.0 //[4.0 6.0 8.0 10.0 12.0 14.0 16.0]
+//   #define CLOUD_STRETCH 1.0 //[2.0 1.4 1.0 0.7 0.5]
+//   #define CLOUD_THICKNESS 5 //[2 4 5 7 10]
+//   #define CLOUD_DETAIL 1.0 //[0.3 0.7 1.0 1.3 1.7]
+//   #define CLOUD_SPEED 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00]
+//   #define CLOUD_OPACITY 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+//   #define CLOUD_BRIGHTNESS 1.0 //[0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2.0]
   #define CLOUD_REVEAL
 
   #define FOG_DENSITY 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
@@ -179,7 +179,7 @@ Please don't edit anything from Undefine section and onwards.
   #define WATER_MODE 1 //[0 1 2 3]
   #define WATER_ALPHA_MODE 0 //[0 1]
   #define WATER_NORMALS 1 //[0 1 2 3]
-  #define WATER_PARALLAX
+  // #define WATER_PARALLAX
 //#define WATER_SHADOW_COLOR
 //#define WATER_CAUSTICS
   #define WATER_BUMP 0.12 //[0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00]
@@ -219,41 +219,10 @@ Please don't edit anything from Undefine section and onwards.
   #define WEATHER_OPACITY 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.50 5.00 5.50 6.00 6.50 7.00 7.50 8.00]
   #define DH_OVERDRAW 1.0 //[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0]
 
-//Camera//
-//#define DOF
-  #define DOF_FOCUS_MODE 0 //[0 1 2 3]
-  #define DOF_STRENGTH 1.00 //[0.12 0.25 0.50 1.00 2.00 4.00 8.00 16.00 32.00 64.00]
-  #define DOF_FOCUS_X 0.50 //[0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
-  #define DOF_FOCUS_Y 0.50 //[0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
-  #define DOF_FOCUS_SPEED 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00]
-//#define DOF_FOCUS_POINT
-  #define DOF_FOCUS_DISTANCE 8.0 //[1.0 2.0 4.0 6.0 8.0 12.0 16.0 24.0 32.0 48.0 64.0 96.0 128.0 192.0 256.0 384.0 512.0]
-//#define MOTION_BLUR
-  #define MOTION_BLUR_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
-  #define BLOOM_RADIUS 3 //[1 2 3]
-  #define BLOOM_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
-  #define BLOOM_THRESHOLD 0.65 //[0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
-  #define BLOOM_CONTRAST 0 //[-4 -3 -2 -1 0 1 2 3 4]
-#define DISABLE_BLOOM
-//#define DIRTY_LENS
-
-//#define VIGNETTE
-  #define VIGNETTE_STRENGTH 1.06 //[0.26 0.51 0.72 0.91 1.06 1.19 1.28 1.36 1.40 1.41]
   #define CHROMATIC_ABERRATION 0 //[0 1 2 3 4]
   #define UNDERWATER_DISTORTION
 
-//Anti-aliasing
-//#define FXAA
-//#define TAA
 
-  #define FXAA_SUBPIXEL 0.50 //[0.00 0.25 0.50 0.75 1.00]
-  #define FXAA_EDGE_SENSITIVITY 1 //[0 1 2]
-
-  #define TAA_MODE 0 //[0 1]
-//#define TAA_SELECTIVE
-
-  #define SHARPEN -1 //[-1 0 1 2 3 4]
-  #define SHARPEN_CLAMP
 
 //Color//
   #define LIGHT_MR 255 //[0 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180 184 188 192 196 200 204 208 212 216 220 224 228 232 236 240 244 248 252 255]
@@ -535,13 +504,7 @@ Please don't edit anything from Undefine section and onwards.
 //#define WHITE_WORLD
 
 //Undefine//
-  #ifdef NETHER
-  #undef REFLECTION_RAIN
-  #endif
 
-  #ifdef END
-  #undef REFLECTION_RAIN
-  #endif
 
   #ifndef SHADOW
   #undef LIGHT_SHAFT
@@ -601,3 +564,94 @@ Please don't edit anything from Undefine section and onwards.
   #endif
 
 #include "/lib/util/lod.glsl"
+
+//Fallbacks for Purged Settings//
+#ifndef CLOUDS
+  #define CLOUDS 0
+#endif
+#ifndef CLOUD_THICKNESS
+  #define CLOUD_THICKNESS 5
+#endif
+#ifndef CLOUD_AMOUNT
+  #define CLOUD_AMOUNT 10.0
+#endif
+#ifndef CLOUD_DENSITY
+  #define CLOUD_DENSITY 4
+#endif
+#ifndef CLOUD_DETAIL
+  #define CLOUD_DETAIL 1.0
+#endif
+#ifndef CLOUD_STRETCH
+  #define CLOUD_STRETCH 1.0
+#endif
+#ifndef CLOUD_SPEED
+  #define CLOUD_SPEED 1.0
+#endif
+#ifndef CLOUD_BRIGHTNESS
+  #define CLOUD_BRIGHTNESS 1.0
+#endif
+#ifndef SSS
+  //#define SSS
+#endif
+#ifndef BASIC_SSS
+  //#define BASIC_SSS
+#endif
+#ifndef REFRACTION
+  #define REFRACTION 0
+#endif
+#ifndef PARALLAX
+  //#define PARALLAX
+#endif
+#ifndef SELF_SHADOW
+  //#define SELF_SHADOW
+#endif
+#ifndef WATER_PARALLAX
+  //#define WATER_PARALLAX
+#endif
+#ifndef FOG_DENSITY
+  #define FOG_DENSITY 1.0
+#endif
+#ifndef FOG_DENSITY_NETHER
+  #define FOG_DENSITY_NETHER 1.0
+#endif
+#ifndef FOG_DENSITY_END
+  #define FOG_DENSITY_END 1.0
+#endif
+#ifndef FOG_HEIGHT
+  //#define FOG_HEIGHT
+#endif
+#ifndef FAR_VANILLA_FOG
+  #define FAR_VANILLA_FOG 0
+#endif
+#ifndef FOG_INTERIOR
+  //#define FOG_INTERIOR
+#endif
+
+// Purged Settings Fallbacks
+#ifndef DOF
+  //#define DOF
+#endif
+#ifndef BLOOM_RADIUS
+  #define BLOOM_RADIUS 0
+#endif
+#ifndef BLOOM_STRENGTH
+  #define BLOOM_STRENGTH 0.0
+#endif
+#ifndef BLOOM_CONTRAST
+  #define BLOOM_CONTRAST 0.0
+#endif
+#ifndef VIGNETTE
+  //#define VIGNETTE
+#endif
+#ifndef VIGNETTE_STRENGTH
+  #define VIGNETTE_STRENGTH 0.0
+#endif
+#ifndef FXAA
+  //#define FXAA
+#endif
+#ifndef TAA
+  //#define TAA
+#endif
+#ifndef SHARPEN
+  #define SHARPEN 0.0
+#endif

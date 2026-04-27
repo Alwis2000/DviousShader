@@ -39,7 +39,7 @@ const ivec3 workGroups = ivec3(128, 64, 128);
 #endif
 
 //Uniforms
-uniform float framemod2;
+uniform int frameCounter;
 uniform vec3 cameraPosition, previousCameraPosition;
 
 uniform usampler3D voxeltex;
@@ -68,7 +68,7 @@ vec3 HSV2RGB(vec3 c) {
 
 //Program
 void main() {
-    int iFrameMod2 = int(framemod2);
+    int iFrameMod2 = int(frameCounter % 2);
 
     // Position derived from gl_GlobalInvocationID and gl_LocalInvocationID
     ivec3 pos = ivec3(gl_GlobalInvocationID);

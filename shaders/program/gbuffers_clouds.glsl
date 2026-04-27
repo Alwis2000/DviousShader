@@ -62,10 +62,7 @@ float moonVisibility = clamp(dot(-sunVec, upVec) * 10.0 + 0.5, 0.0, 1.0);
 
 //Program//
 void main() {
-	#if CLOUDS != 3
-	discard;
-	#endif
-	
+	#if defined CLOUDS && CLOUDS == 3
 	vec4 albedo = texture2D(texture, texCoord);
 	albedo.rgb = pow(albedo.rgb,vec3(2.2));
 	
@@ -75,7 +72,10 @@ void main() {
 		  vanillaDiffuse = mix(vanillaDiffuse, 0.75, rainStrength * 0.75);
 		  vanillaDiffuse*= vanillaDiffuse;
 
-	albedo.rgb *= lightCol * vanillaDiffuse * CLOUD_BRIGHTNESS;
+	albedo.rgb *= lightCol * vanillaDiffuse;
+	#ifdef CLOUD_BRIGHTNESS
+	albedo.rgb *= CLOUD_BRIGHTNESS;
+	#endif
 	albedo.rgb *= mix(0.4 - 0.25 * rainStrength, 0.5 - 0.425 * rainStrength, sunVisibility);
 	
 	vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
@@ -141,6 +141,9 @@ void main() {
 	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
 	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
 	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
+	#endif
+	#else
+	discard;
 	#endif
 }
 

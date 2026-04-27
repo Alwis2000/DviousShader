@@ -78,60 +78,7 @@ void UnderwaterDistort(inout vec2 texCoord) {
 	if (mask < 0.5) texCoord = originalTexCoord;
 }
 
-vec3 GetBloomTile(float lod, vec2 coord, vec2 offset) {
-	float scale = exp2(lod);
-	float resScale = 1.25 * min(720.0, viewHeight) / viewHeight;
-	vec3 bloom = texture2D(colortex1, (coord / scale + offset) * resScale).rgb;
-	bloom *= bloom; bloom *= bloom * 32.0;
-	return bloom;
-}
 
-void Bloom(inout vec3 color, vec2 coord) {
-	#ifdef DISABLE_BLOOM
-	return;
-	#endif
-
-	vec2 view = vec2(1.0 / viewWidth, 1.0 / viewHeight);
-	vec3 blur1 = GetBloomTile(1.0, coord, vec2(0.0      , 0.0   ) + vec2( 0.5, 0.0) * view);
-	vec3 blur2 = GetBloomTile(2.0, coord, vec2(0.50     , 0.0   ) + vec2( 4.5, 0.0) * view);
-	vec3 blur3 = GetBloomTile(3.0, coord, vec2(0.50     , 0.25  ) + vec2( 4.5, 4.0) * view);
-	vec3 blur4 = GetBloomTile(4.0, coord, vec2(0.625    , 0.25  ) + vec2( 8.5, 4.0) * view);
-	vec3 blur5 = GetBloomTile(5.0, coord, vec2(0.6875   , 0.25  ) + vec2(12.5, 4.0) * view);
-	vec3 blur6 = GetBloomTile(6.0, coord, vec2(0.625    , 0.3125) + vec2( 8.5, 8.0) * view);
-	vec3 blur7 = GetBloomTile(7.0, coord, vec2(0.640625 , 0.3125) + vec2(12.5, 8.0) * view);
-
-	#ifdef DIRTY_LENS
-	float newAspectRatio = 1.777777777777778 / aspectRatio;
-	vec2 scale = vec2(max(newAspectRatio, 1.0), max(1.0 / newAspectRatio, 1.0));
-	float dirt = texture2D(colortex7, (coord - 0.5) / scale + 0.5).r;
-	dirt *= length(blur6 / (1.0 + blur6));
-	blur3 *= dirt *  2.0 + 1.0;
-	blur4 *= dirt *  4.0 + 1.0;
-	blur5 *= dirt *  8.0 + 1.0;
-	blur6 *= dirt * 16.0 + 1.0;
-	blur7 *= dirt * 32.0 + 1.0;
-	#endif
-
-	#if BLOOM_RADIUS == 1
-	vec3 blur = (blur1 * 4.00 + blur2 * 2.82 + blur3 * 2.00 + blur4 * 1.41 + blur5) / 11.23;
-	#elif BLOOM_RADIUS == 2
-	vec3 blur = (blur1 * 4.00 + blur2 * 3.03 + blur3 * 2.30 + blur4 * 1.74 + blur5 * 1.32 + blur6) / 13.39;
-	#else
-	vec3 blur = (blur1 * 4.00 + blur2 * 3.18 + blur3 * 2.52 + blur4 * 2.00 + blur5 * 1.59 + blur6 * 1.26 + blur7) / 15.55;
-	#endif
-
-	#if BLOOM_CONTRAST == 0
-	color += blur * (0.2 * BLOOM_STRENGTH);
-	#else
-	vec3 bloomContrast = vec3(exp2(BLOOM_CONTRAST * 0.25));
-	color = pow(color, bloomContrast);
-	blur = pow(blur, bloomContrast);
-	vec3 bloomStrength = pow(vec3(0.2 * BLOOM_STRENGTH), bloomContrast);
-	color += blur * bloomStrength;
-	color = pow(color, 1.0 / bloomContrast);
-	#endif
-
-}
 
 void ColorGrading(inout vec3 color) {
 	vec3 cgColor = pow(color.r, CG_RC) * pow(vec3(CG_RR, CG_RG, CG_RB) / 255.0, vec3(2.2)) +
@@ -265,27 +212,6 @@ void main() {
 	float tempVisibleSun = texture2D(colortex2, vec2(3.0 * pw, ph)).r;
 	#endif
 
-	vec3 temporalColor = vec3(0.0);
-	#ifdef TAA
-	temporalColor = texture2D(colortex2, texCoord).gba;
-	#endif
-
-	Bloom(color, newTexCoord);
-
-    #ifdef VIGNETTE
-	float screenDist = length(texCoord - 0.5);
-	screenDist *= screenDist * 0.3535 + 0.75;
-	color *= 1.0 - screenDist * VIGNETTE_STRENGTH;
-	#endif
-
-	float temporalData = 0.0;
-
-	#ifdef DOF
-	if (texCoord.x >= 4.0 * pw && texCoord.x < 6.0 * pw && texCoord.y < 2.0 * ph) {
-		temporalData = texture2D(colortex2, texCoord.xy).r;
-	}
-	#endif
-
 	color = pow(color, vec3(1.0 / 2.2));
 
 	#ifdef MCBL_SS
@@ -295,7 +221,7 @@ void main() {
 
 	/* DRAWBUFFERS:12 */
 	gl_FragData[0] = vec4(color, 1.0);
-	gl_FragData[1] = vec4(temporalData, temporalColor);
+	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 0.0);
 
 	#ifdef MCBL_SS
 		/*DRAWBUFFERS:129*/

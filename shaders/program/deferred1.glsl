@@ -201,7 +201,7 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
 #include "/lib/atmospherics/fog.glsl"
-#include "/lib/atmospherics/clouds.glsl"
+// #include "/lib/atmospherics/clouds.glsl"
 #include "/lib/atmospherics/sunmoon.glsl"
 
 #ifdef OUTLINE_ENABLED

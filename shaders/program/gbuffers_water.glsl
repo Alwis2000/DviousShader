@@ -91,9 +91,7 @@ uniform ivec2 atlasSize;
 uniform sampler2D specular;
 uniform sampler2D normals;
 
-#ifdef REFLECTION_RAIN
-uniform float wetness;
-#endif
+
 #endif
 
 #if DYNAMIC_HANDLIGHT > 0
@@ -243,9 +241,7 @@ void NetherPortalParallax(inout vec4 albedo, float dither) {
 #include "/lib/surface/directionalLightmap.glsl"
 
 
-#ifdef REFLECTION_RAIN
-#include "/lib/reflections/rainPuddles.glsl"
-#endif
+
 #endif
 
 #ifdef MULTICOLORED_BLOCKLIGHT
@@ -486,25 +482,7 @@ void main() {
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
 		#ifdef ADVANCED_MATERIALS
-		float puddles = 0.0;
-		#ifdef REFLECTION_RAIN	
-		if (water < 0.5) {
-			puddles = GetPuddles(worldPos, newCoord, lightmap.y, NoU, wetness);
-		}
 
-		ApplyPuddleToMaterial(puddles, albedo, smoothness, f0, porosity);
-
-		if (puddles > 0.001 && rainStrength > 0.001) {
-			mat3 tbnMatrix = mat3(tangent.x, binormal.x, normal.x,
-							  tangent.y, binormal.y, normal.y,
-							  tangent.z, binormal.z, normal.z);
-
-			vec3 puddleNormal = GetPuddleNormal(worldPos, viewPos, tbnMatrix);
-			newNormal = normalize(
-				mix(newNormal, puddleNormal, puddles * sqrt(1.0 - porosity) * rainStrength)
-			);
-		}
-		#endif
 		#endif
 		
 		float fresnel = 0.30; // Mirror-like water for toon aesthetic

@@ -6,7 +6,7 @@ profile.LOW=Low
 profile.MEDIUM=Medium
 profile.HIGH=High
 profile.ULTRA=Ultra
-profile.comment=Minimum: no shadows, no extra effects. Low : low shadows, no extra effects. Medium : low-medium shadows, and ambient occlusion. High : medium shadows, AO light shafts, and TAA. Ultra : high shadows, AO, light shafts, and TAA.
+profile.comment=Minimum: no shadows, no extra effects. Low : low shadows, no extra effects. Medium : low-medium shadows, and ambient occlusion. High : medium shadows, AO, and light shafts. Ultra : high shadows, AO, and light shafts.
 
 #Screens
 screen.LIGHTING=Lighting
@@ -32,7 +32,7 @@ screen.ANIMATION=Animations
 
 
 screen.CAMERA=Camera
-screen.DOF=Depth of Field Config
+
 
 screen.COLOR=Color
 screen.LIGHT_COLOR=Lighting Color
@@ -80,7 +80,7 @@ screen.CG_G=Green Channel
 screen.CG_B=Blue Channel
 screen.CG_T=Tint
 
-screen.ANTIALIASING=Anti-aliasing
+
 
 screen.EXTRAS=Extras
 
@@ -182,7 +182,7 @@ value.SHADOW_SKY_FALLOFF.0.8=Sharp
 value.SHADOW_SKY_FALLOFF.0.8667=Very Sharp
 
 option.CONTACT_SHADOWS=Contact Shadows
-option.CONTACT_SHADOWS.comment=Adds fine-detail shadows based on screen depth. §a[+]§rThis effect benefits from TAA.
+option.CONTACT_SHADOWS.comment=Adds fine-detail shadows based on screen depth.
 
 #Ambient Occlusion Config
 option.AO_METHOD=AO Method
@@ -233,20 +233,8 @@ option.MATERIAL_FORMAT.comment=Determines the specular and normal map format use
 value.MATERIAL_FORMAT.0=SEUS/Old PBR
 value.MATERIAL_FORMAT.1=labPBR 1.3
 
-option.SSS=Subsurface Scattering*
-option.SSS.comment=Allows light to penetrate and scatter through blocks. §a[+]§rThis effect benefits from TAA.
-
-option.BASIC_SSS=Basic Scattering
-option.BASIC_SSS.comment=Enables a simplified version of subsurface scattering to certain blocks.
-
 option.ENTITY_FLASH=Entity Flash
 option.ENTITY_FLASH.comment=Enables color overlay on damaged entities and flashing creepers.
-
-option.REFRACTION=Refraction
-option.REFRACTION.comment=Enables distortion behind normal mapped transparent surfaces. §c[-]§rThe transparent surface itself will be distorted. §c[-]§rSome other features may not work properly with this effect enabled.
-value.REFRACTION.0=OFF
-value.REFRACTION.1=Water Only
-value.REFRACTION.2=Full
 
 option.ALBEDO_BALANCING=Albedo Balancing
 option.ALBEDO_BALANCING.comment=Reduces brightness of very bright colored surfaces.
@@ -303,16 +291,7 @@ option.REFLECTION_SPECULAR.comment=Enables reflection on smooth or metallic surf
 option.REFLECTION_ROUGH=Rough Reflection*
 option.REFLECTION_ROUGH.comment=Allows surfaces with lower smoothness to render blurry reflections. §c[-]§rMay contain minor artifacts.
 
-option.REFLECTION_RAIN=Rain Reflection*
-option.REFLECTION_RAIN.comment=Allows surfaces to be wet while raining.  §e[*]§rRequires specular reflection.
 
-option.REFLECTION_RAIN_AMOUNT=Puddle Amount
-option.REFLECTION_RAIN_AMOUNT.comment=Adjusts the amount of puddles created while raining.
-value.REFLECTION_RAIN_AMOUNT.0.4=Very Low
-value.REFLECTION_RAIN_AMOUNT.0.5=Low
-value.REFLECTION_RAIN_AMOUNT.0.6=Medium
-value.REFLECTION_RAIN_AMOUNT.0.7=High
-value.REFLECTION_RAIN_AMOUNT.1.0=Very High
 
 option.SPECULAR_HIGHLIGHT_ROUGH=Rough Specular Highlight*
 option.SPECULAR_HIGHLIGHT_ROUGH.comment=Allows rough surfaces to have weak gloss.
@@ -321,42 +300,7 @@ option.ALBEDO_METAL=labPBR Albedo Metal*
 option.ALBEDO_METAL.comment=Applies base texture as tint on hardcoded metallic surfaces. §e[*]§rWorks on labPBR material format only.
 
 #Normals & Parallax
-option.PARALLAX=Parallax Occlusion Mapping*
-option.PARALLAX.comment=Adds displacement on a surface using height map.
 
-option.PARALLAX_DEPTH=Parallax Depth*
-option.PARALLAX_DEPTH.comment=Adjusts parallax deepness.
-value.PARALLAX_DEPTH.0.05=5 cm
-value.PARALLAX_DEPTH.0.10=10 cm
-value.PARALLAX_DEPTH.0.15=15 cm
-value.PARALLAX_DEPTH.0.20=20 cm
-value.PARALLAX_DEPTH.0.25=25 cm
-value.PARALLAX_DEPTH.0.30=30 cm
-value.PARALLAX_DEPTH.0.35=35 cm
-value.PARALLAX_DEPTH.0.40=40 cm
-value.PARALLAX_DEPTH.0.45=45 cm
-value.PARALLAX_DEPTH.0.50=50 cm
-
-option.PARALLAX_QUALITY=Parallax Samples*
-option.PARALLAX_QUALITY.comment=Adjusts the quality of parallax occlusion mapping.
-
-option.PARALLAX_DISTANCE=Parallax Distance*
-option.PARALLAX_DISTANCE.comment=Adjusts how far parallax occlusion mapping and self shadows can be rendered.
-
-option.PARALLAX_PORTAL=Portal Parallax
-option.PARALLAX_PORTAL.comment=Enables parallax effect on nether & end portal.
-
-option.SELF_SHADOW=Self Shadows*
-option.SELF_SHADOW.comment=Allows a surface to cast shadow to itself using heightmap.
-
-option.SELF_SHADOW_ANGLE=Self Shadows Angle*
-option.SELF_SHADOW_ANGLE.comment=Adjusts the self shadowing angle, higher value allows the shadow to travel further.
-
-option.SELF_SHADOW_QUALITY=Self Shadows Samples*
-option.SELF_SHADOW_QUALITY.comment=Adjusts the quality of self shadowing.
-
-option.SELF_SHADOW_STRENGTH=Self Shadows Strength*
-option.SELF_SHADOW_STRENGTH.comment=Adjusts the intensity of self shadowing.
 
 option.DIRECTIONAL_LIGHTMAP=Directional Lightmap*
 option.DIRECTIONAL_LIGHTMAP.comment=Adds normal mapping to vanilla lighting. §c[-]§rLightmap may glitch with this effect enabled.
@@ -421,77 +365,7 @@ value.DH_OVERDRAW.8.0=7 chunks
 value.DH_OVERDRAW.9.0=8 chunks
 
 #Cloud
-option.CLOUDS=Clouds
-option.CLOUDS.comment=Enables clouds. §a[+]§rSkybox and volumetric clouds benefit from TAA. §e[*]§rVanilla clouds requires vanilla cloud setting set to default or on.
-value.CLOUDS.0=§cOff
-value.CLOUDS.1=Skybox
-value.CLOUDS.2=Volumetric
-value.CLOUDS.3=Vanilla
 
-option.CLOUD_BASE=Base Shape
-option.CLOUD_BASE.comment=Determines which noise type used for the cloud's base shape.
-value.CLOUD_BASE.0=Perlin
-value.CLOUD_BASE.1=Worley
-value.CLOUD_BASE.2=Blocky
-
-option.CLOUD_DENSITY=Density
-option.CLOUD_DENSITY.comment=Adjusts cloud density, higher density makes artifacts more visible.
-value.CLOUD_DENSITY.1=Very Low
-value.CLOUD_DENSITY.2=Low
-value.CLOUD_DENSITY.4=Medium
-value.CLOUD_DENSITY.6=High
-value.CLOUD_DENSITY.8=Very High
-
-option.CLOUD_AMOUNT=Amount
-option.CLOUD_AMOUNT.comment=Adjusts cloud amount. §e[*]§rThis option is ignored by blocky base shape.
-value.CLOUD_AMOUNT.12.0=Very Low
-value.CLOUD_AMOUNT.11.0=Low
-value.CLOUD_AMOUNT.10.0=Medium
-value.CLOUD_AMOUNT.9.0=High
-value.CLOUD_AMOUNT.8.0=Very High
-
-option.CLOUD_HEIGHT=Height
-option.CLOUD_HEIGHT.comment=Adjusts cloud height.
-value.CLOUD_HEIGHT.-1=Auto
-
-option.CLOUD_SCALE=Volumetric Scale
-option.CLOUD_SCALE.comment=Adjusts volumetric cloud size.
-
-option.CLOUD_STRETCH=Stretch
-option.CLOUD_STRETCH.comment=Adjusts cloud stretch.
-value.CLOUD_STRETCH.2.0=Very Low
-value.CLOUD_STRETCH.1.4=Low
-value.CLOUD_STRETCH.1.0=Medium
-value.CLOUD_STRETCH.0.7=High
-value.CLOUD_STRETCH.0.5=Very High
-
-option.CLOUD_THICKNESS=Thickness
-option.CLOUD_THICKNESS.comment=Adjusts cloud thickness.
-value.CLOUD_THICKNESS.2=Very Low
-value.CLOUD_THICKNESS.4=Low
-value.CLOUD_THICKNESS.5=Medium
-value.CLOUD_THICKNESS.7=High
-value.CLOUD_THICKNESS.10=Very High
-
-option.CLOUD_DETAIL=Detail
-option.CLOUD_DETAIL.comment=Adjusts cloud detail.  §e[*]§rThis option is ignored by blocky base shape.
-value.CLOUD_DETAIL.0.3=Very Low
-value.CLOUD_DETAIL.0.7=Low
-value.CLOUD_DETAIL.1.0=Medium
-value.CLOUD_DETAIL.1.3=High
-value.CLOUD_DETAIL.1.7=Very High
-
-option.CLOUD_SPEED=Speed
-option.CLOUD_SPEED.comment=Adjusts cloud speed.
-
-option.CLOUD_OPACITY=Opacity
-option.CLOUD_OPACITY.comment=Adjusts cloud opacity.
-
-option.CLOUD_BRIGHTNESS=Brightness
-option.CLOUD_BRIGHTNESS.comment=Adjusts cloud brightness.
-
-option.CLOUD_REVEAL=Reveal Sun & Moon
-option.CLOUD_REVEAL.comment=Reduces amount of cloud around sun & moon. §e[*]§rThis option is ignored by blocky base shape.
 
 #Fog
 option.FOG_DENSITY=Overworld Fog Density
@@ -601,7 +475,7 @@ option.STARS=Stars
 option.STARS.comment=Enables stars.
 
 option.AURORA=Aurora
-option.AURORA.comment=Enables aurora. §a[+]§rThis effect benefits from TAA.
+option.AURORA.comment=Enables aurora.
 value.AURORA.0=Off
 value.AURORA.1=Snow Biomes Only
 value.AURORA.2=Full
@@ -739,8 +613,7 @@ option.WAVING_LANTERN.comment=Allows lantern to wave.
 
 
 #Camera
-option.DOF=Depth of Field
-option.DOF.comment=Enables camera focus effect.
+
 
 option.MOTION_BLUR=Motion Blur
 option.MOTION_BLUR.comment=Enables camera motion based blurring.
@@ -748,50 +621,11 @@ option.MOTION_BLUR.comment=Enables camera motion based blurring.
 option.MOTION_BLUR_STRENGTH=Motion Blur Strength
 option.MOTION_BLUR_STRENGTH.comment=Adjusts motion blur intensity.
 
-option.BLOOM_RADIUS=Bloom Radius
-option.BLOOM_RADIUS.comment=Adjusts how far the glow spreads.
-value.BLOOM_RADIUS.1=Low
-value.BLOOM_RADIUS.2=Medium
-value.BLOOM_RADIUS.3=High
-
-option.BLOOM_STRENGTH=Bloom Strength
-option.BLOOM_STRENGTH.comment=Adjusts bloom intensity.
-
-option.BLOOM_THRESHOLD=Bloom Threshold
-option.BLOOM_THRESHOLD.comment=Determines the brightness required for an object to start blooming. Higher values remove "haze" from common surfaces while keeping lights glowing.
-
-option.BLOOM_CONTRAST=Bloom Contrast
-option.BLOOM_CONTRAST.comment=Adjusts whether the bloom should preserve color contrast or detail visibility. Higher value preserves color contrast while lower value preserves detail visibility.
-value.BLOOM_CONTRAST.-4=-1.00
-value.BLOOM_CONTRAST.-3=-0.75
-value.BLOOM_CONTRAST.-2=-0.50
-value.BLOOM_CONTRAST.-1=-0.25
-value.BLOOM_CONTRAST.0=0.00
-value.BLOOM_CONTRAST.1=0.25
-value.BLOOM_CONTRAST.2=0.50
-value.BLOOM_CONTRAST.3=0.75
-value.BLOOM_CONTRAST.4=1.00
-
-option.DIRTY_LENS=Dirty Lens
-option.DIRTY_LENS.comment=Adds dusty particle effect to bloom.
 
 
 
-option.VIGNETTE=Vignette
-option.VIGNETTE.comment=Fades the edge of the screen to black. §e[*]§rDisable for 360 imaging.
 
-option.VIGNETTE_STRENGTH=Vignette Strength
-option.VIGNETTE_STRENGTH.comment=Adjusts vignette intensity.
-value.VIGNETTE_STRENGTH.0.26=0.1
-value.VIGNETTE_STRENGTH.0.51=0.2
-value.VIGNETTE_STRENGTH.0.72=0.3
-value.VIGNETTE_STRENGTH.0.91=0.4
-value.VIGNETTE_STRENGTH.1.06=0.5
-value.VIGNETTE_STRENGTH.1.19=0.6
-value.VIGNETTE_STRENGTH.1.28=0.7
-value.VIGNETTE_STRENGTH.1.36=0.8
-value.VIGNETTE_STRENGTH.1.40=0.9
-value.VIGNETTE_STRENGTH.1.41=1.0
+
 
 option.CHROMATIC_ABERRATION=Chromatic Aberration
 option.CHROMATIC_ABERRATION.comment=Adds color distortion around the borders.
@@ -805,30 +639,7 @@ option.UNDERWATER_DISTORTION=Underwater Distortion
 option.UNDERWATER_DISTORTION.comment=Applies screen distortion while underwater.
 
 #Depth of Field
-option.DOF_FOCUS_MODE=DoF Focus Mode
-option.DOF_FOCUS_MODE.comment=Determines how focus distance is calculated. Auto uses center depth. Auto adjustable uses depth on Auto Focus X & Y. Manual uses focus distance slider. Manual+ uses focus distance slider and brightness slider (in video settings).
-value.DOF_FOCUS_MODE.0=Auto
-value.DOF_FOCUS_MODE.1=Auto Adjustable
-value.DOF_FOCUS_MODE.2=Manual
-value.DOF_FOCUS_MODE.3=Manual+
 
-option.DOF_STRENGTH=DoF Strength
-option.DOF_STRENGTH.comment=Adjusts the focus strength, higher value blurs quicker.
-
-option.DOF_FOCUS_X=Auto Focus X
-option.DOF_FOCUS_X.comment=Adjusts horizontal position of the auto focus point. §c[-]§rThis option is ignored in Auto mode.
-
-option.DOF_FOCUS_Y=Auto Focus Y
-option.DOF_FOCUS_Y.comment=Adjusts vertical position of the auto focus point. §c[-]§rThis option is ignored in Auto mode.
-
-option.DOF_FOCUS_SPEED=Auto Focus Speed
-option.DOF_FOCUS_SPEED.comment=Adjusts the speed of focus distance smoothing. §c[-]§rThis option is ignored in Auto mode.
-
-option.DOF_FOCUS_POINT=Show Auto Focus Point
-option.DOF_FOCUS_POINT.comment=Shows focus point as a white dot.
-
-option.DOF_FOCUS_DISTANCE=DoF Focus Distance
-option.DOF_FOCUS_DISTANCE.comment=Determines focus distance while using manual focus mode.
 
 #Color
 option.LIGHT_MR=Red
@@ -1086,46 +897,7 @@ option.CG_TB=Tint - Blue Value
 option.CG_TI=Tint Strength Value
 option.CG_TM=Tint Mix Value
 
-#Anti-aliasing
-option.FXAA=FXAA
-option.FXAA.comment=Enables fast approximate anti-aliasing, done by smoothing out edges with minimal performance cost. §e[*]§rPlease disable Antialiasing in Shaders menu while this option is enabled (Optifine only).
 
-option.TAA=TAA
-option.TAA.comment=Enables temporal anti-aliasing, done by smart frame blending which captures improves tiny details and some effects. §e[*]§rSharpening included. §e[*]§rPlease disable Antialiasing in Shaders menu while this option is enabled (Optifine only).
-
-option.FXAA_SUBPIXEL=FXAA Subpixel Smoothing
-option.FXAA_SUBPIXEL.comment=Adjusts how much smoothing should FXAA apply to tiny details.
-value.FXAA_SUBPIXEL.0.00=§cOff
-value.FXAA_SUBPIXEL.0.25=Low
-value.FXAA_SUBPIXEL.0.50=Medium
-value.FXAA_SUBPIXEL.0.75=High
-value.FXAA_SUBPIXEL.1.00=Very High
-
-option.FXAA_EDGE_SENSITIVITY=FXAA Edge Sensitivity
-option.FXAA_EDGE_SENSITIVITY.comment=Adjusts how much edge contrast and brightness required to apply FXAA.
-value.FXAA_EDGE_SENSITIVITY.0=Low
-value.FXAA_EDGE_SENSITIVITY.1=Medium
-value.FXAA_EDGE_SENSITIVITY.2=High
-
-option.TAA_MODE=TAA Mode
-option.TAA_MODE.comment=Determines how TAA should be done. Smooth allows some effects to look better at the cost of ghosting. Coarse have less ghosting but barely improves other effects.
-value.TAA_MODE.0=Smooth
-value.TAA_MODE.1=Coarse
-
-option.TAA_SELECTIVE=Selective TAA
-option.TAA_SELECTIVE.comment=Exclude entities and hand from temporal anti aliasing to reduce ghosting. §c[-]§rExcluded objects will need to rely on FXAA. §c[-]§rMay cause flickering with some resource packs, data packs, or mods.
-
-option.SHARPEN=Sharpen
-option.SHARPEN.comment=Reduces blurring. Auto: 0.50 when FXAA and TAA are enabled, otherwise 0.00. §c[-]§rIncreased sharpening makes noise and flickering more visible.
-value.SHARPEN.-1=Auto
-value.SHARPEN.0=0.00
-value.SHARPEN.1=0.25
-value.SHARPEN.2=0.50
-value.SHARPEN.3=0.75
-value.SHARPEN.4=1.00
-
-option.SHARPEN_CLAMP=Sharpen Clamp
-option.SHARPEN_CLAMP.comment=Prevents increased contrast on edges caused by sharpening.
 
 #Extras
 option.OUTLINE=Outline

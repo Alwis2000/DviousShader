@@ -12,8 +12,7 @@ vec3 WorldToVoxel(vec3 worldPos) {
 }
 
 bool IsInVoxelMapVolume(vec3 voxelPos) {
-	vec3 clampedVoxelPos = clamp(voxelPos, vec3(0), voxelMapSize);
-	return voxelPos == clampedVoxelPos;
+	return all(greaterThanEqual(voxelPos, vec3(0.0))) && all(lessThan(voxelPos, voxelMapSize));
 }
 
 float GetVoxelMapSoftBounds(vec3 voxelPos) {
