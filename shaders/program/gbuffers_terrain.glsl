@@ -128,6 +128,10 @@ float GetLuminance(vec3 color) {
 //Program//
 void main() {
     vec4 albedo = texture2D(texture, texCoord) * vec4(color.rgb, 1.0);
+
+	// Early alpha discard — skip all lighting math for transparent leaf/plant pixels
+	if (albedo.a < 0.1) discard;
+
 	vec3 newNormal = normal;
 	float smoothness = 0.0;
 	vec3 lightAlbedo = vec3(0.0);
@@ -227,6 +231,8 @@ void main() {
 		NoL *= NoL;
 		#endif
 
+		if (foliage > 0.5 || leaves > 0.5) NoL = 1.0;
+
 		float vanillaDiffuse = 1.0;
 		
 		#ifndef NORMAL_PLANTS
@@ -236,7 +242,10 @@ void main() {
 		float parallaxShadow = 1.0;
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
-		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0);
+		// Skip expensive 3D voxel lookup for foliage/leaves — they rarely benefit from MCBL
+		if (foliage < 0.5 && leaves < 0.5) {
+			blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0);
+		}
 		#endif
 
 		#ifdef GLOWING_ORES

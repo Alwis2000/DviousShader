@@ -20,6 +20,7 @@ vec3 DistortShadow(vec3 shadowPos, float distortFactor) {
 vec3 SampleBasicShadow(vec3 shadowPos) {
     float shadow0 = texture2DShadow(shadowtex0, shadowPos);
 
+    #ifdef SHADOW_COLOR
     if (shadow0 < 0.999) {
         vec3 shadowCol = texture2D(shadowcolor0, shadowPos.xy).rgb *
                         texture2DShadow(shadowtex1, shadowPos);
@@ -28,6 +29,7 @@ vec3 SampleBasicShadow(vec3 shadowPos) {
         #endif
         return clamp(mix(shadowCol, vec3(1.0), shadow0), vec3(0.0), vec3(16.0));
     }
+    #endif
 
     return vec3(shadow0);
 }

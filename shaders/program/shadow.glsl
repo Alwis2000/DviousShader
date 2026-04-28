@@ -218,8 +218,8 @@ void main() {
 	if (blockID == 201 || blockID == 202) mat = 1;
 	if (blockID == 200 || blockID == 205) mat = 2;
 	
-	if (blockID >= 100 && blockID <= 109 && blockID != 105) mat = 3;
-	
+	if ((blockID >= 100 && blockID <= 109 && blockID != 105) || blockID == 157) mat = 3;
+
 	vec4 position = shadowModelViewInverse * shadowProjectionInverse * ftransform();
 
 	#ifdef WATER_CAUSTICS
@@ -232,13 +232,7 @@ void main() {
 
 
 	#ifdef MULTICOLORED_BLOCKLIGHT
-	if (gl_VertexID % 4 == 0) {
-		vec3 worldPos = position.xyz + cameraPosition;
-		vec3 voxelPos = WorldToVoxel(worldPos);
-		if (IsInVoxelMapVolume(voxelPos)) {
-			imageStore(voxelimg, ivec3(voxelPos), uvec4(128u, 0u, 0u, 0u));
-		}
-	}
+
 	// Original logic (keeping it just in case)
 	if (at_midBlock != vec3(0.0)) {
 		UpdateVoxelMap(gl_VertexID, blockData);

@@ -117,7 +117,7 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 
 	vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
 
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 16; i++) {
 		float traceStep = (exp2(i * 0.32) - 1.0) * 4.0 + 0.1;
 		vec3 tracePos = viewPos + traceOffset + lightVec * traceStep;
 

@@ -29,11 +29,11 @@ Please don't edit anything from Undefine section and onwards.
 
 //Lighting//
   #define SHADOW
-  const int shadowMapResolution = 2048;
+  const int shadowMapResolution = 1536;
   const float shadowDistance = 128.0;
   const float shadowMapBias = 0.85;
   //#define SHADOW_FILTER
-  #define SHADOW_COLOR
+//#define SHADOW_COLOR
 
   #define SHADOW_ENTITY
   #define SHADOW_BLOCK_ENTITY
@@ -50,13 +50,13 @@ Please don't edit anything from Undefine section and onwards.
 //#define DESATURATION
   #define DESATURATION_FACTOR 1.5 //[2.0 1.5 1.0 0.5 0.0]
   #define DYNAMIC_HANDLIGHT 2 //[0 1 2]
-//#define HALF_LAMBERT
+  #define HALF_LAMBERT
 
 
 //#define MCBL_FOG
   #define MCBL_FOG_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
-  #define MCBL_DISTANCE 256 //[128 192 256 384 512]
-//#define MCBL_HALF_HEIGHT
+  #define MCBL_DISTANCE 128 //[128 192 256 384 512]
+  #define MCBL_HALF_HEIGHT
 //#define MCBL_RANDOM
 //#define MCBL_SS
   #define MCBL_SS_MODE 0 //[0 1]
@@ -64,8 +64,8 @@ Please don't edit anything from Undefine section and onwards.
 
 //Material//
 
-  #define REFLECTION 2 //[0 1 2]
-  #define REFLECTION_TRANSLUCENT
+  #define REFLECTION 1 //[0 1 2]
+//#define REFLECTION_TRANSLUCENT
   #define REFLECTION_MODE 1 //[0 1 2]
 //#define REFLECTION_PREVIOUS
   #define SPECULAR_HIGHLIGHT 2 //[0 1 2]
@@ -165,7 +165,7 @@ Please don't edit anything from Undefine section and onwards.
   #define WATER_DETAIL 0.10 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50]
   #define WATER_SHARPNESS 0.2 //[0.8 0.5 0.2]
   #define WATER_SPEED 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00]
-  #define WATER_FOG 0 //[0 1]
+  #define WATER_FOG 1 //[0 1]
   #define WATER_FOG_DENSITY 1.00 //[0.25 0.50 0.75 1.00 1.50 2.00 2.50 3.00 3.50 4.00]
   #define WATER_CAUSTICS_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
   #define WATER_PIXEL 16 //[0 16 32 64 128]
@@ -194,7 +194,7 @@ Please don't edit anything from Undefine section and onwards.
   
   #define WEATHER_PERBIOME
   #define WEATHER
-  #define FLAT_DIRECTIONAL_LIGHTING
+  //#define FLAT_DIRECTIONAL_LIGHTING
   #define WEATHER_OPACITY 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.50 5.00 5.50 6.00 6.50 7.00 7.50 8.00]
   #define DH_OVERDRAW 1.0 //[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0]
 
@@ -412,7 +412,7 @@ Please don't edit anything from Undefine section and onwards.
 
 //Extras//
   #define OUTLINE 1 //[0 1 2 3 4]
-  #define OUTLINE_WIDTH 4.0 // [0.5 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0]
+  #define OUTLINE_WIDTH 6.0 // [0.5 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 10.0 12.0 14.0 16.0 20.0]
 //#define TOON_LIGHTMAP
 
 

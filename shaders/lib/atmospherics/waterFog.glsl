@@ -4,7 +4,7 @@ uniform vec3 fogColor;
 
 vec4 GetWaterFog(vec3 viewPos, vec3 waterAlbedo) {
     float fog = length(viewPos) / waterFogRange;
-    fog = 1.0 - exp(-2.0 * fog);
+    fog = 1.0 - exp(-3.0 * fog);
     
     #if WATER_MODE == 0 || WATER_MODE == 2
     vec3 waterFogColor = waterColor.rgb * waterColor.a;
@@ -12,6 +12,8 @@ vec4 GetWaterFog(vec3 viewPos, vec3 waterAlbedo) {
     vec3 waterFogColor = fogColor * fogColor * 0.125;
     if (isEyeInWater == 0) waterFogColor = waterAlbedo;
     #endif
+
+    waterFogColor = mix(waterFogColor, vec3(0.0, 0.8, 0.9), 0.15); // Stronger cyan tint
     waterFogColor *= WATER_F * WATER_F * (1.0 - max(blindFactor, darknessFactor));
 
     #ifdef OVERWORLD

@@ -24,7 +24,12 @@ float Noise2D(vec2 pos) {
 vec3 CalcMove(vec3 pos, float density, float speed, vec2 mult) {
     pos = pos * density + time * speed;
     mult *= ANIMATION_STRENGTH;
+    #ifdef SHADOW_PASS
+    // Fast path for shadow pass: sin-based approximation avoids 12 hash calls per vertex
+    vec3 wave = vec3(sin(pos.y + pos.z), sin(pos.x + pos.z + 0.333), sin(pos.x + pos.y + 0.667)) * 0.5;
+    #else
     vec3 wave = vec3(Noise2D(pos.yz), Noise2D(pos.xz + 0.333), Noise2D(pos.xy + 0.667));
+    #endif
     return wave * vec3(mult, mult.x);
 }
 

@@ -424,7 +424,6 @@ void main() {
 			vec3 opaqueViewPos = ToNDC(opaqueScreenPos);
 
 			vec4 waterFog = GetWaterFog(opaqueViewPos - viewPos.xyz, fogAlbedo);
-			waterFog.rgb *= waterFog.a;
 			albedo = mix(waterFog, albedo / max(albedo.a, 0.0001), albedo.a);
 		}
 		#endif

@@ -67,7 +67,7 @@ void Outline(vec3 color, bool secondPass, out vec4 innerOutline, out float minLi
         #endif
 	}
 
-    iOutlineColor *= 1.4;
+    iOutlineColor *= 1.6;
     iOutlineMask = 1.0 - iOutlineMask;
 
     innerOutline = vec4(iOutlineColor, iOutlineMask);
