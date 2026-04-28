@@ -31,6 +31,7 @@ uniform mat4 gbufferModelView, gbufferPreviousModelView, gbufferModelViewInverse
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex3;
+uniform sampler2D colortex6;
 uniform sampler2D depthtex0;
 uniform sampler2D noisetex;
 
@@ -132,11 +133,7 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 
 		if (traceZ >= 1.0) {
 		#endif
-			float z1 = texture2DLod(depthtex, pos.xy, 0).r;
-			float z2 = texture2DLod(depthtex, pos.xy + vec2(pixelSize.x, 0.0), 0).r;
-			float z3 = texture2DLod(depthtex, pos.xy + vec2(0.0, pixelSize.y), 0).r;
-			float z4 = texture2DLod(depthtex, pos.xy + pixelSize, 0).r;
-			traceZ = min(min(z1, z2), min(z3, z4));
+			traceZ = texture2DLod(depthtex, pos.xy, 0).r;
 
 			float linZ2 = traceZ * 2.0 - 1.0;
 			zDelta = -tracePos.z - (- (linZ2 * projectionInverse[2].z + projectionInverse[3].z) / (linZ2 * projectionInverse[2].w + projectionInverse[3].w));

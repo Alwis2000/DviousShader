@@ -232,7 +232,7 @@ void main() {
 
 
 	#ifdef MULTICOLORED_BLOCKLIGHT
-	{
+	if (gl_VertexID % 4 == 0) {
 		vec3 worldPos = position.xyz + cameraPosition;
 		vec3 voxelPos = WorldToVoxel(worldPos);
 		if (IsInVoxelMapVolume(voxelPos)) {
