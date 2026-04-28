@@ -169,8 +169,11 @@ void main() {
 		float emission       = float(entityColor.a > 0.05) * 0.125 + endCrystal;
 		vec3 baseReflectance = vec3(0.04);
 		
-		vec3 hsv = RGB2HSV(albedo.rgb);
-		emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		vec3 hsv = vec3(0.0);
+		if (emission > 0.01) {
+			hsv = RGB2HSV(albedo.rgb);
+			emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		}
 		emission += endBeam;
 
 		#ifndef ENTITY_FLASH

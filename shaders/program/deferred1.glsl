@@ -380,25 +380,21 @@ void main() {
 	#endif
 
 	#if !defined REFLECTION_PREVIOUS && REFRACTION == 0
-	/* DRAWBUFFERS:045 */
+	/* DRAWBUFFERS:05 */
 	gl_FragData[0] = color;
-	gl_FragData[1] = vec4(1.0);
-	gl_FragData[2] = vec4(reflectionColor, reflectionMask);
+	gl_FragData[1] = vec4(reflectionColor, reflectionMask);
 	#elif defined REFLECTION_PREVIOUS && REFRACTION > 0
-	/* DRAWBUFFERS:046 */
+	/* DRAWBUFFERS:06 */
 	gl_FragData[0] = color;
-	gl_FragData[1] = vec4(1.0);
-	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
+	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
 	#elif !defined REFLECTION_PREVIOUS && REFRACTION > 0
-	/* DRAWBUFFERS:0456 */
+	/* DRAWBUFFERS:056 */
 	gl_FragData[0] = color;
-	gl_FragData[1] = vec4(1.0);
-	gl_FragData[2] = vec4(reflectionColor, reflectionMask);
-	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
+	gl_FragData[1] = vec4(reflectionColor, reflectionMask);
+	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
 	#else
-	/* DRAWBUFFERS:04 */
+	/* DRAWBUFFERS:0 */
 	gl_FragData[0] = color;
-	gl_FragData[1] = vec4(1.0);
 	#endif
 }
 

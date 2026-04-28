@@ -151,11 +151,17 @@ void main() {
 		float emission        = (emissive + candle + lava);
 		vec3 baseReflectance  = vec3(0.04);
 		
-		vec3 hsv = RGB2HSV(albedo.rgb);
-		emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		vec3 hsv = vec3(0.0);
+		if (emission > 0.5 || ore + netherOre > 0.5) {
+			hsv = RGB2HSV(albedo.rgb);
+			emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		}
 		
 		#ifdef GLOWING_ORES
-		float oreEmission = GetOreEmission(hsv, ore, netherOre);
+		float oreEmission = 0.0;
+		if (ore + netherOre > 0.5) {
+			oreEmission = GetOreEmission(hsv, ore, netherOre);
+		}
 		#endif
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);

@@ -226,8 +226,11 @@ void main() {
 		float emission        = float(blockID == 155);
 		vec3 baseReflectance  = vec3(0.04);
 		
-		vec3 hsv = RGB2HSV(albedo.rgb);
-		emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		vec3 hsv = vec3(0.0);
+		if (emission > 0.5) {
+			hsv = RGB2HSV(albedo.rgb);
+			emission *= GetHardcodedEmission(albedo.rgb, hsv);
+		}
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
 		vec3 viewPos = ToNDC(screenPos);
