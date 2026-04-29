@@ -144,7 +144,7 @@ Please don't edit anything from Undefine section and onwards.
   #define SHADER_END_SKY
 //#define SKY_DEFERRED
 
-//#define SHADER_SUN_MOON
+  #define SHADER_SUN_MOON
   #define SUN_MOON_GROUND
   #define STARS
   #define AURORA 0 //[0 1 2]
@@ -153,7 +153,7 @@ Please don't edit anything from Undefine section and onwards.
   #define SUN_INTENSITY 1.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
   #define MOON_INTENSITY 1.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
   #define SHADER_SUN_MOON_SHAPE 0 //[0 1]
-  #define SHADER_SUN_MOON_SIZE 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50]
+  #define SHADER_SUN_MOON_SIZE 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00]
 
   #define WATER_MODE 1 //[0 1 2 3]
   #define WATER_ALPHA_MODE 0 //[0 1]

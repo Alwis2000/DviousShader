@@ -44,13 +44,15 @@ void ShaderSunMoon(inout vec3 color, vec3 viewPos, vec3 sunColor, vec3 moonColor
 	float VoLb = dot(nViewPos, sunBinormal);
 	
 	#if SHADER_SUN_MOON_SHAPE == 0
-    float sunMoonSize = (0.007 - 0.004 * isMoon) * SHADER_SUN_MOON_SIZE;
-	float sun = pow(smoothstep(1.0 - sunMoonSize, 1.0, abs(VoL)), 3.0);
+    float sunMoonSize = (0.15 - 0.05 * isMoon) * SHADER_SUN_MOON_SIZE;
+	vec2 sunUV = vec2(VoLt, VoLb) / (abs(VoL) + 0.0001);
+	float sun = pow(smoothstep(sunMoonSize, sunMoonSize * 0.9, length(sunUV)), 2.0);
 	#else
-    float sunMoonSize = (0.08 - 0.03 * isMoon) * SHADER_SUN_MOON_SIZE;
-    vec2 sdfCoord = abs(vec2(VoLt, VoLb) / sunMoonSize * 1.667) - 1.0;
+    float sunMoonSize = (0.24 - 0.08 * isMoon) * SHADER_SUN_MOON_SIZE;
+	vec2 sunUV = vec2(VoLt, VoLb) / (abs(VoL) + 0.0001);
+    vec2 sdfCoord = abs(sunUV / sunMoonSize) - 1.0;
     float squareSDF = length(max(sdfCoord, 0.0));
-	float sun = pow(smoothstep(0.667, 0.0, squareSDF), 3.0);
+	float sun = pow(smoothstep(0.0, -0.1, squareSDF), 2.0);
 	#endif
 
 	float miniGlare = 0.0;
@@ -67,7 +69,7 @@ void ShaderSunMoon(inout vec3 color, vec3 viewPos, vec3 sunColor, vec3 moonColor
 	vec3 moonNormal = vec3(0.0);
 
 	if (sun > 0.0 && isMoon > 0.5 && moonPhase > 0) {
-		float rad = 0.08 * sqrt(SHADER_SUN_MOON_SIZE);
+		float rad = 0.12 * sqrt(SHADER_SUN_MOON_SIZE);
 
 		float moonNormalX = clamp(VoLt / rad, -1.0, 1.0);
 		float moonNormalY = clamp(VoLb / rad, -1.0, 1.0);

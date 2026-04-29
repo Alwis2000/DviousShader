@@ -176,8 +176,8 @@ void main() {
 	}
 	#endif
 
-	// remove vanilla sunset gradient
-	if (renderStage == MC_RENDER_STAGE_MOON) {
+	// remove vanilla sun and moon
+	if (renderStage == MC_RENDER_STAGE_SUN || renderStage == MC_RENDER_STAGE_MOON) {
 		alpha = 0.0;
 	}
 }
