@@ -250,7 +250,7 @@ void main() {
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 		// Skip expensive 3D voxel lookup for foliage/leaves — they rarely benefit from MCBL
 		if (foliage < 0.5 && leaves < 0.5) {
-			blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0);
+			blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0, lightmap.x);
 		}
 		#endif
 

@@ -124,7 +124,7 @@ void main() {
 			  vanillaDiffuse*= vanillaDiffuse;
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
-		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, normal, 0.0);
+		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, normal, 0.0, lightmap.x);
 		#endif
 		
 		vec3 shadow = vec3(0.0);

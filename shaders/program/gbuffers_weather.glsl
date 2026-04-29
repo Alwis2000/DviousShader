@@ -106,7 +106,7 @@ void main() {
 		#endif
 		
 		#ifdef MULTICOLORED_BLOCKLIGHT
-		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, vec3(0.0), 0.0);
+		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, vec3(0.0), 0.0, lightmap.x);
 		#endif
 
 		albedo.a *= 0.35 * rainStrength * length(albedo.rgb / 3.0) * float(albedo.a > 0.1);

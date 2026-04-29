@@ -47,7 +47,7 @@ float GetMCBLLegacyMask(vec3 worldPos) {
 	#endif
 }
 
-vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldPos, vec3 normal, float hand) {
+vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldPos, vec3 normal, float hand, float lmCoordX) {
 	vec3 mcblCol = vec3(0.0);
 	float voxelBounds = 0.0;
 
@@ -59,7 +59,11 @@ vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldP
 
 	vec3 voxelMapPos = WorldToVoxel(worldPos);
 	
-	if (IsInVoxelMapVolume(voxelMapPos)) {
+	// Early-out: if blocklight lightmap is near zero, no emissive block is close enough
+	// to contribute meaningfully. Avoids the expensive 3D texture fetch for unlit surfaces
+	// (e.g. sunlit forest canopy, outdoor terrain). blocklightCol.r encodes lmCoord.x^12.
+	// We use a heuristic threshold — if the max channel of current blocklightCol is tiny, skip.
+	if (IsInVoxelMapVolume(voxelMapPos) && lmCoordX > 0.002) {
 		voxelBounds = GetVoxelMapSoftBounds(voxelMapPos);
 
 		voxelMapPos /= voxelMapSize;

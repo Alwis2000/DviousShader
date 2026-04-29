@@ -209,7 +209,7 @@ void main() {
 		float parallaxShadow = 1.0;
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
-		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, vec3(0.0), newNormal, 1.0);
+		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, vec3(0.0), newNormal, 1.0, lightmap.x);
 		#endif
 		
 		vec3 shadow = vec3(0.0);

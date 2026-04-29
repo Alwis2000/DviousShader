@@ -90,32 +90,9 @@ vec3 CalcGrassBend(vec3 position) {
     return position * bendAmount;
 }
 
-#if defined MULTICOLORED_BLOCKLIGHT && !defined SHADOW_PASS && !defined DISTANT_HORIZONS
-#ifndef LIGHTTEX0_DECLARED
-uniform sampler3D lighttex0;
-#define LIGHTTEX0_DECLARED
-#endif
-#include "/lib/util/voxelMapHelper.glsl"
-
-vec3 CalcVoxelPush(vec3 worldPos) {
-    vec3 voxelPos = WorldToVoxel(worldPos);
-    if (IsInVoxelMapVolume(voxelPos)) {
-        vec4 voxel = texelFetch(lighttex0, ivec3(voxelPos), 0);
-        if (voxel.a > 0.0) { // Alpha channel marks entity presence
-            return vec3(0.0, -0.7, 0.0);
-        }
-    }
-    return vec3(0.0);
-}
-#endif
-
 vec3 WavingBlocks(vec3 position, int blockID, float istopv) {
     vec3 wave = vec3(0.0);
     vec3 worldPos = position + cameraPosition;
-
-    #if defined MULTICOLORED_BLOCKLIGHT && !defined SHADOW_PASS && !defined DISTANT_HORIZONS
-    wave += CalcVoxelPush(worldPos);
-    #endif
 
     #ifdef WAVING_GRASS
     if (blockID == 100 && istopv > 0.9) {
@@ -151,8 +128,13 @@ vec3 WavingBlocks(vec3 position, int blockID, float istopv) {
     #endif
 
     #ifdef WAVING_LEAF
-    if (blockID == 105)
-        wave += CalcMove(worldPos, 0.25, 1.0, vec2(0.08, 0.08));
+    if (blockID == 105) {
+        // Use fast sin-based wave for leaves — Noise2D (12 hash evals/vertex) is
+        // overkill for dense canopy geometry where individual leaf motion isn't visible.
+        vec3 lp = worldPos * 0.25 + time * 1.0;
+        vec3 leafWave = vec3(sin(lp.y + lp.z), sin(lp.x + lp.z + 0.333), sin(lp.x + lp.y + 0.667)) * 0.5;
+        wave += leafWave * vec3(0.08, 0.08, 0.08) * ANIMATION_STRENGTH;
+    }
     #endif
 
     #ifdef WAVING_VINE
