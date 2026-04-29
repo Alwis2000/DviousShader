@@ -215,17 +215,15 @@ void main() {
 		NoL *= NoL;
 		#endif
 
-		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
-		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
-		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-			  vanillaDiffuse*= vanillaDiffuse;
+		float vanillaDiffuse = 1.05; // Standardized to match terrain (with 1.05x compensation)
 
-
+		/* 
 		if (entityId >= 10104) {
 			float dotL = dot(newNormal, lightVec);
 			float directionalFactor = mix(1.0, mix(0.5, 1.0, clamp(dotL * 0.5 + 0.5, 0.0, 1.0)), lightmap.y);
 			vanillaDiffuse *= directionalFactor;
 		}
+		*/
 
 		float parallaxShadow = 1.0;
 

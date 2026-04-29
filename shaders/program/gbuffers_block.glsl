@@ -274,10 +274,7 @@ void main() {
 		NoL *= NoL;
 		#endif
 
-		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
-		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
-		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-			  vanillaDiffuse*= vanillaDiffuse;
+		float vanillaDiffuse = 1.05; // Standardized to match terrain (with 1.05x compensation)
 
 		float parallaxShadow = 1.0;
 

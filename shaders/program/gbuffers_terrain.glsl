@@ -190,6 +190,11 @@ void main() {
 		
     	albedo.rgb = pow(albedo.rgb, vec3(2.2));
 
+		#ifdef ALBEDO_BALANCING
+		float albedoLum = GetLuminance(albedo.rgb);
+		albedo.rgb /= (0.2 * albedoLum + 0.8);
+		#endif
+
 		if (lava > 0.5) {
 			albedo.rgb = mix(albedo.rgb, vec3(1.0, 0.3, 0.01), 0.4);
 		}
