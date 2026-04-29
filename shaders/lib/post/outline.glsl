@@ -43,8 +43,8 @@ void Outline(vec3 color, bool secondPass, out vec4 innerOutline, out float minLi
 	float linZ = SampleFullLinearDepth(texCoord);
 	minLinZ = linZ;
 
-	float distScale = 1.0 / (1.0 + max(linZ - 4.0, 0.0) * 0.07);
-	distScale = max(distScale, 0.15);
+	float distScale = 1.0 / (1.0 + max(linZ - 4.0, 0.0) * 0.15);
+	distScale = max(distScale, 0.05);
 	float ph = (OUTLINE_WIDTH * ceil(viewHeight / 1600.0) * distScale) / viewHeight;
 	float pw = ph / aspectRatio;
 
