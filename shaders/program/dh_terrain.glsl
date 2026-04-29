@@ -175,9 +175,7 @@ void main() {
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 			  vanillaDiffuse*= vanillaDiffuse;
 		
-		#ifndef NORMAL_PLANTS
-		if (foliage > 0.5) vanillaDiffuse *= 1.8;
-		#endif
+// Removed foliage diffuse boost
 
 		
 		vec3 shadow = vec3(1.0);
@@ -272,7 +270,7 @@ void main() {
 
 	if (blockID == DH_BLOCK_LEAVES){
 		mat = 2.0;
-		color.rgb *= 1.225 * 1.1;
+		// Removed color boost
 	}
 	if (blockID == DH_BLOCK_ILLUMINATED)
 		mat = 3.0;

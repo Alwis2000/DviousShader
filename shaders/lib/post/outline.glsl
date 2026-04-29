@@ -40,14 +40,16 @@ float SampleFullLinearDepthOffset(vec2 coord, float currentLinZ) {
 }
 
 void Outline(vec3 color, bool secondPass, out vec4 innerOutline, out float minLinZ) {
-	float ph = (OUTLINE_WIDTH * ceil(viewHeight / 1600.0)) / viewHeight;
+	float linZ = SampleFullLinearDepth(texCoord);
+	minLinZ = linZ;
+
+	float distScale = 1.0 / (1.0 + max(linZ - 4.0, 0.0) * 0.07);
+	distScale = max(distScale, 0.15);
+	float ph = (OUTLINE_WIDTH * ceil(viewHeight / 1600.0) * distScale) / viewHeight;
 	float pw = ph / aspectRatio;
 
 	float iOutlineMask = 1.0;
 	vec3 iOutlineColor = color;
-
-	float linZ = SampleFullLinearDepth(texCoord);
-	minLinZ = linZ;
 
     // Optimized: Reduced sample count for performance. 4 iterations (8 samples) is usually enough.
     int sampleCount = 2; 
@@ -63,7 +65,7 @@ void Outline(vec3 color, bool secondPass, out vec4 innerOutline, out float minLi
         #ifdef OUTLINE_INNER
         float linSampleZSum = linSampleZ1 + linSampleZ2;
         linSampleZSum -= abs(linSampleZ1 - linSampleZ2) * 0.5;
-        iOutlineMask *= clamp(1.125 + (linZ * 2.0 - linSampleZSum) * 64.0, 0.0, 1.0);
+        iOutlineMask *= clamp(1.125 + (linZ * 2.0 - linSampleZSum) * (64.0 / max(linZ, 1.0)), 0.0, 1.0);
         #endif
 	}
 

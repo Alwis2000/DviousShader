@@ -134,7 +134,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	float rawEmission = emission;
 
 	if(leaves > 0.5){
-		albedo.rgb *= 1.225;
+		// Removed color boost
 		albedo.a = 1.0;
 	}
 

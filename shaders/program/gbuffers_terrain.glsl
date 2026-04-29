@@ -241,9 +241,7 @@ void main() {
 
 		float vanillaDiffuse = 1.0;
 		
-		#ifndef NORMAL_PLANTS
-		if (foliage > 0.5) vanillaDiffuse *= 1.8;
-		#endif
+// Removed foliage diffuse boost
 
 		float parallaxShadow = 1.0;
 
@@ -353,7 +351,7 @@ void main() {
 		mat = 1.0;
 	if (blockID == 105 || blockID == 106){
 		mat = 2.0;
-		color.rgb *= 1.225;
+		// Removed color boost
 	}
 	if (blockID >= 150 && blockID < 200)
 		mat = 3.0;
