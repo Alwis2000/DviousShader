@@ -40,30 +40,7 @@ float GGXTrowbridgeReitz(float NoHsqr, float roughness){
     return roughnessSqr / (3.14159 * distr * distr);
 }
 
-float BSLSquarePhong(float sunSize, vec3 normal, vec3 lightVec, vec3 viewPos, float roughness) {
-    viewPos = reflect(viewPos, normal);
-
-    const vec2 sunRotationData = vec2(cos(sunPathRotation * 0.01745329251994), -sin(sunPathRotation * 0.01745329251994));
-    float ang = fract(timeAngle + 0.0001 - 0.25);
-    ang = (ang + (cos(ang * 3.14159265358979) * -0.5 + 0.5 - ang) / 3.0) * 6.28318530717959;
-
-    vec3 nextSunVec = normalize((gbufferModelView * vec4(vec3(-sin(ang), cos(ang) * sunRotationData) * 2000.0, 1.0)).xyz);
-    vec3 sunTangent = normalize(nextSunVec - sunVec);
-    vec3 sunBinormal = -cross(sunVec, sunTangent);
-
-    float VoL = dot(-viewPos, lightVec);
-    float VoLt = dot(viewPos, sunTangent);
-    float VoLb = dot(viewPos, sunBinormal);
-
-    vec2 sdfCoord = abs(vec2(VoLt, VoLb) / sunSize * 1.667) - 1.0;
-    float squareSDF = length(max(sdfCoord, 0.0));
-
-    float NoHsqr = max(1.0 - pow(squareSDF * sunSize, 2.0), 0.0) * step(0.0, VoL);
-    
-    float roughnessSqr = roughness * roughness;
-    float distr = NoHsqr * (roughnessSqr - 1.0) + 1.0;
-    return roughnessSqr / (3.14159 * distr * distr);
-}
+//GGXTrowbridgeReitz D function
 
 float SchlickGGX(float NoL, float NoV, float roughness){
     float k = roughness * 0.5;
@@ -97,11 +74,7 @@ vec3 GGX(vec3 normal, vec3 viewPos, float smoothness, vec3 baseReflectance, floa
     }
     NoV = max(NoV, 0.0);
     
-    #if SHADER_SUN_MOON_SHAPE == 0
     float D = GGXTrowbridgeReitz(NoHsqr, roughness);
-    #else
-    float D = BSLSquarePhong(sunSize, normal, lightVec, viewPos, roughness);
-    #endif
     vec3  F = SphericalGaussianFresnel(HoL, baseReflectance);
     float G = SchlickGGX(NoL, NoV, roughness);
     
@@ -132,7 +105,7 @@ vec3 GetSpecularHighlight(vec3 normal, vec3 viewPos, float smoothness, vec3 base
     #endif
     
     vec3 specular = GGX(normal, normalize(viewPos), smoothness, baseReflectance,
-                        (0.025 * sunVisibility + 0.05) * SHADER_SUN_MOON_SIZE);
+                        (0.025 * sunVisibility + 0.05));
     specular *= shadow * shadowFade * smoothLighting;
     specular *= (1.0 - rainStrength) * (1.0 - rainStrength);
     

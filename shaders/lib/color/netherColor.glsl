@@ -11,21 +11,7 @@ vec4 netherBasalt  = vec4(vec3(NETHER_BR, NETHER_BG, NETHER_BB) / 255.0, 1.0) * 
 #ifdef NETHER_VANILLA
 vec4 netherColSqrt = vec4(normalize(fogColor + 0.0001), length(fogColor));
 #else
-#ifdef WEATHER_PERBIOME
-uniform float isValley, isCrimson, isWarped, isBasalt;
-float nBiomeWeight = isValley + isCrimson + isWarped + isBasalt;
-
-vec4 netherColSqrt = mix(
-    netherNether,
-    (
-        netherValley  * isValley  + netherCrimson * isCrimson +
-        netherWarped  * isWarped  + netherBasalt  * isBasalt
-    ) / max(nBiomeWeight, 0.0001),
-    nBiomeWeight
-);
-#else
 vec4 netherColSqrt = netherNether;
-#endif
 #endif
 
 vec4 netherCol = netherColSqrt * netherColSqrt;

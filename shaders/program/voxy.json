@@ -30,15 +30,6 @@
 	}",
 
 	"uniforms": [
-		#ifdef WEATHER_PERBIOME
-		"isDesert",
-		"isMesa",
-		"isCold",
-		"isSwamp",
-		"isMushroom",
-		"isSavanna",
-		"isJungle",
-		#endif
 
 
 		#ifdef MCBL_SS

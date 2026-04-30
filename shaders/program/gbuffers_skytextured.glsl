@@ -97,12 +97,6 @@ void main() {
 	albedo.a *= SKYBOX_OPACITY;
 	#endif
 	
-	#ifdef SHADER_SUN_MOON
-	if (renderStage == MC_RENDER_STAGE_SUN || renderStage == MC_RENDER_STAGE_MOON) {
-		albedo *= 0.0;
-	}
-	#endif
-	
 	#ifdef SKY_DESATURATION
 	if (renderStage != MC_RENDER_STAGE_SUN) {
 		vec3 desat = GetLuminance(albedo.rgb) * pow(lightNight, vec3(1.6)) * 4.0;

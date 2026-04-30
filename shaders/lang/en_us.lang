@@ -52,23 +52,12 @@ screen.FOG_COLOR=Fog Color
 screen.WATER_COLOR=Water Color
 screen.WEATHER_COLOR=Weather Color
 screen.WEATHER_R=Rain (Normal)
-screen.WEATHER_C=Snow (Cold Biomes)
-screen.WEATHER_D=Desert
-screen.WEATHER_B=Mesa
-screen.WEATHER_S=Swamp
-screen.WEATHER_M=Mushroom Island
-screen.WEATHER_V=Savanna
-screen.WEATHER_J=Jungle
 screen.AURORA_COLOR=Aurora Color
 screen.AURORA_L=Low Section Color
 screen.AURORA_H=High Section Color
 screen.DIMENSION_COLOR=Dimension Color
 screen.NETHER_COLOR=Nether Color
 screen.NETHER_N=Nether Wastes
-screen.NETHER_V=Soul Sand Valley
-screen.NETHER_C=Crimson Forest
-screen.NETHER_W=Warped Forest
-screen.NETHER_B=Basalt Deltas
 screen.END_COLOR=End Color
 screen.SELECTION_COLOR=Block Selection Color
 
@@ -345,8 +334,6 @@ option.FLAT_DIRECTIONAL_LIGHTING.comment=Removes face-shading from blocks, relyi
 #Environment
 
 
-option.WEATHER_PERBIOME=Per Biome Weather
-option.WEATHER_PERBIOME.comment=Use varied weather color for different biomes. §c[-]§rMay not work under unknown conditions.
 
 option.WEATHER_OPACITY=Weather Opacity
 option.WEATHER_OPACITY.comment=Adjusts weather opacity.
@@ -396,14 +383,6 @@ option.FOG_DENSITY_NIGHT.comment=Adjusts fog density multiplier at night and whi
 option.FOG_DENSITY_WEATHER=Weather Density
 option.FOG_DENSITY_WEATHER.comment=Adjusts fog density multiplier while raining.
 
-option.FOG_DENSITY_COLD=Cold Density
-option.FOG_DENSITY_COLD.comment=Adjusts fog density multiplier while standing on cold biomes. Cold biomes include any biome where snow occurs. §e[*]§rRequires Per Biome Weather.
-
-option.FOG_DENSITY_DRY=Dry Density
-option.FOG_DENSITY_DRY.comment=Adjusts fog density multiplier while standing on dry biomes. Dry biomes include desert, badlands/mesa, and savanna. §e[*]§rRequires Per Biome Weather.
-
-option.FOG_DENSITY_DAMP=Damp Density
-option.FOG_DENSITY_DAMP.comment=Adjusts fog density multiplier while standing on damp biomes. Damp biomes include swamp, mushroom island, and jungle. §e[*]§rRequires Per Biome Weather.
 
 option.FOG_DENSITY_INDOOR=Indoor Density
 option.FOG_DENSITY_INDOOR.comment=Adjusts fog density multiplier while indoors.
@@ -458,9 +437,6 @@ option.SKY_DEFERRED=Deferred Sky
 option.SKY_DEFERRED.comment=Renders sky after opaque surfaces are drawn instead of at the beginning. §e[*]§rThis affects resource pack sky rendering.
 
 #Skybox
-option.SHADER_SUN_MOON=Shader Sun & Moon
-option.SHADER_SUN_MOON.comment=Enables shader based sun & moon. §e[*]§rDisable vanilla sun & moon in Video Settings > Details > Sun & Moon on 1.16.4 or below.
-
 option.SUN_MOON_GROUND=Sun & Moon Ground
 option.SUN_MOON_GROUND.comment=Fades sun & moon below the horizon when enabled.
 
@@ -484,14 +460,6 @@ option.SUN_INTENSITY.comment=Adjusts skybox sun intensity. §c[-]§rOnly availab
 
 option.MOON_INTENSITY=Moon Intensity
 option.MOON_INTENSITY.comment=Adjusts skybox moon intensity. §c[-]§rOnly available for 1.16.5 or above.
-
-option.SHADER_SUN_MOON_SHAPE=Sun & Moon Shape
-option.SHADER_SUN_MOON_SHAPE.comment=Determines the shape of shader based sun & moon and specular highlight.
-value.SHADER_SUN_MOON_SHAPE.0=Round
-value.SHADER_SUN_MOON_SHAPE.1=Square
-
-option.SHADER_SUN_MOON_SIZE=Sun & Moon Size
-option.SHADER_SUN_MOON_SIZE.comment=Adjusts size for round sun & moon and specular highlight.
 
 #Water
 option.WATER_MODE=Water Texture Mode
@@ -712,40 +680,6 @@ option.WEATHER_RG=Green
 option.WEATHER_RB=Blue
 option.WEATHER_RI=Intensity
 
-option.WEATHER_CR=Red
-option.WEATHER_CG=Green
-option.WEATHER_CB=Blue
-option.WEATHER_CI=Intensity
-
-option.WEATHER_DR=Red
-option.WEATHER_DG=Green
-option.WEATHER_DB=Blue
-option.WEATHER_DI=Intensity
-
-option.WEATHER_BR=Red
-option.WEATHER_BG=Green
-option.WEATHER_BB=Blue
-option.WEATHER_BI=Intensity
-
-option.WEATHER_SR=Red
-option.WEATHER_SG=Green
-option.WEATHER_SB=Blue
-option.WEATHER_SI=Intensity
-
-option.WEATHER_MR=Red
-option.WEATHER_MG=Green
-option.WEATHER_MB=Blue
-option.WEATHER_MI=Intensity
-
-option.WEATHER_VR=Red
-option.WEATHER_VG=Green
-option.WEATHER_VB=Blue
-option.WEATHER_VI=Intensity
-
-option.WEATHER_JR=Red
-option.WEATHER_JG=Green
-option.WEATHER_JB=Blue
-option.WEATHER_JI=Intensity
 
 option.AURORA_LR=Red
 option.AURORA_LG=Green
@@ -762,25 +696,6 @@ option.NETHER_NG=Green
 option.NETHER_NB=Blue
 option.NETHER_NI=Intensity
 
-option.NETHER_VR=Red
-option.NETHER_VG=Green
-option.NETHER_VB=Blue
-option.NETHER_VI=Intensity
-
-option.NETHER_CR=Red
-option.NETHER_CG=Green
-option.NETHER_CB=Blue
-option.NETHER_CI=Intensity
-
-option.NETHER_WR=Red
-option.NETHER_WG=Green
-option.NETHER_WB=Blue
-option.NETHER_WI=Intensity
-
-option.NETHER_BR=Red
-option.NETHER_BG=Green
-option.NETHER_BB=Blue
-option.NETHER_BI=Intensity
 
 option.END_R=Red
 option.END_G=Green

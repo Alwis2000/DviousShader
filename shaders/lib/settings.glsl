@@ -117,9 +117,6 @@ Please don't edit anything from Undefine section and onwards.
   
   #define FOG_DENSITY_NIGHT 4.00 //[1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.25 4.50 4.75 5.00 5.25 5.50 5.75 6.00 6.25 6.50 6.75 7.00 7.25 7.50 7.75 8.00]
   #define FOG_DENSITY_WEATHER 1.50 //[1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
-  #define FOG_DENSITY_COLD 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
-  #define FOG_DENSITY_DRY 1.25 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
-  #define FOG_DENSITY_DAMP 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
   #define FOG_DENSITY_INDOOR 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00 2.12 2.25 2.37 2.50 2.62 2.75 2.87 3.00 3.12 3.25 3.37 3.50 3.62 3.75 3.87 4.00]
   #define FOG_DENSITY_LOD 1.00 //[0.00 0.12 0.25 0.37 0.50 0.62 0.75 0.87 1.00 1.12 1.25 1.37 1.50 1.62 1.75 1.87 2.00]
 
@@ -144,7 +141,6 @@ Please don't edit anything from Undefine section and onwards.
   #define SHADER_END_SKY
 //#define SKY_DEFERRED
 
-  #define SHADER_SUN_MOON
   #define SUN_MOON_GROUND
   #define STARS
   #define AURORA 0 //[0 1 2]
@@ -152,8 +148,6 @@ Please don't edit anything from Undefine section and onwards.
   #define SKYBOX_OPACITY 0.50 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
   #define SUN_INTENSITY 1.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
   #define MOON_INTENSITY 1.50 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00]
-  #define SHADER_SUN_MOON_SHAPE 0 //[0 1]
-  #define SHADER_SUN_MOON_SIZE 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00]
 
   #define WATER_MODE 1 //[0 1 2 3]
   #define WATER_ALPHA_MODE 0 //[0 1]
@@ -192,7 +186,6 @@ Please don't edit anything from Undefine section and onwards.
   #define LIGHT_SHAFT_NIGHT_FALLOFF 0.50 //[0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 0.80 0.85 0.90 0.95 1.00]
   #define LIGHT_SHAFT_WEATHER_FALLOFF 8.0 //[1.0 1.4 2.0 2.8 4.0 5.6 8.0 11.2 16.0]
   
-  #define WEATHER_PERBIOME
   #define WEATHER
   //#define FLAT_DIRECTIONAL_LIGHTING
   #define WEATHER_OPACITY 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.50 5.00 5.50 6.00 6.50 7.00 7.50 8.00]

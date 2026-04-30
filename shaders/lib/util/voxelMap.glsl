@@ -26,14 +26,4 @@ void UpdateVoxelMap(int vertexID, int blockData) {
 		imageStore(voxelimg, ivec3(voxelPos), uvec4(uint(blockData), 0u, 0u, 0u));
 	}
 }
-
-void UpdateEntityVoxelMap() {
-	vec3 viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
-	vec3 worldPos = (shadowModelViewInverse * vec4(viewPos, 1.0)).xyz;
-	vec3 voxelPos = WorldToVoxel(worldPos);
-
-	if (IsInVoxelMapVolume(voxelPos)) {
-		// Use the 8th bit (128) of the Red channel for entity presence
-		imageStore(voxelimg, ivec3(voxelPos), uvec4(128u, 0u, 0u, 0u));
-	}
-}
+

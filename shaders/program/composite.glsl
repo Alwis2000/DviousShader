@@ -63,10 +63,6 @@ uniform sampler2D colortex8;
 uniform sampler2D colortex9;
 #endif
 
-#ifdef OUTLINE_ENABLED
-uniform sampler2D gaux1;
-#endif
-
 #ifdef VOXY
 uniform int vxRenderDistance;
 

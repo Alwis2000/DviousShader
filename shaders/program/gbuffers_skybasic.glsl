@@ -13,12 +13,14 @@ https://capttatsu.com
 varying float alpha;
 
 varying vec3 upVec, sunVec;
+varying vec4 color;
 
 //Uniforms//
 uniform int bedrockLevel;
 uniform int frameCounter;
 uniform int isEyeInWater;
 uniform int moonPhase;
+uniform int renderStage;
 uniform int worldTime;
 
 uniform float blindFactor, darknessFactor;
@@ -49,6 +51,14 @@ uniform int vxRenderDistance;
 uniform int dhRenderDistance;
 #endif
 
+#ifndef MC_RENDER_STAGE_SUN
+#define MC_RENDER_STAGE_SUN 1
+#endif
+
+#ifndef MC_RENDER_STAGE_MOON
+#define MC_RENDER_STAGE_MOON 1
+#endif
+
 //Common Variables//
 #ifdef WORLD_TIME_ANIMATION
 float time = float(worldTime) * 0.05 * ANIMATION_SPEED;
@@ -76,7 +86,6 @@ float GetLuminance(vec3 color) {
 #include "/lib/atmospherics/stars.glsl"
 
 #include "/lib/atmospherics/sky.glsl"
-#include "/lib/atmospherics/sunmoon.glsl"
 
 //Program//
 void main() {
@@ -89,13 +98,9 @@ void main() {
 	
 	albedo = GetSkyColor(viewPos.xyz, false);
 	
-	#ifdef SHADER_SUN_MOON
-	vec3 lightMA = mix(lightMorning, lightEvening, mefade);
-    vec3 sunColor = mix(lightMA, sqrt(lightDay * lightMA * LIGHT_DI), timeBrightness);
-    vec3 moonColor = lightNight * 1.25;
-
-	ShaderSunMoon(albedo, viewPos.xyz, sunColor, moonColor);
-	#endif
+	if (renderStage == MC_RENDER_STAGE_SUN || renderStage == MC_RENDER_STAGE_MOON) {
+		albedo = color.rgb;
+	}
 
 	#ifdef STARS
 	if (moonVisibility > 0.0) DrawStars(albedo.rgb, viewPos.xyz);
@@ -106,8 +111,6 @@ void main() {
 	#if AURORA > 0
 	albedo.rgb += DrawAurora(viewPos.xyz, dither, 24);
 	#endif
-
-	SunGlare(albedo, viewPos.xyz, lightCol);
 
 	albedo.rgb *= 1.0 + nightVision;
 	#ifdef CLASSIC_EXPOSURE
@@ -133,6 +136,7 @@ void main() {
 varying float alpha;
 
 varying vec3 sunVec, upVec;
+varying vec4 color;
 
 //Uniforms//
 uniform int renderStage;
@@ -162,6 +166,8 @@ void main() {
 
 	upVec = normalize(gbufferModelView[1].xyz);
 	
+	color = gl_Color;
+	
 	gl_Position = ftransform();
 
 	alpha = 1.0;
@@ -175,11 +181,6 @@ void main() {
 		alpha = 0.0;
 	}
 	#endif
-
-	// remove vanilla sun and moon
-	if (renderStage == MC_RENDER_STAGE_SUN || renderStage == MC_RENDER_STAGE_MOON) {
-		alpha = 0.0;
-	}
 }
 
 #endif

@@ -133,8 +133,7 @@ void main() {
     // Optimization: Branchless light masking (replaces 'if (emission == vec3(0.0))')
     light = mix(light, vec3(0.0), step(0.0001, dot(emission, emission)));
 
-    float entityFlag = step(127.5, float(voxelData));
-    vec4 color = vec4(fma(light, tint, emission), entityFlag);
+    vec4 color = vec4(fma(light, tint, emission), 1.0);
 
     // Apply void mask
     color *= isNotVoid;
