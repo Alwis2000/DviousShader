@@ -1,16 +1,14 @@
-#ifdef SHADOW
-#ifndef VOXY_PATCH
+#if defined SHADOW && !defined VOXY_PATCH
 uniform sampler2D shadowtex0;
 uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 
-float texture2DShadow(sampler2D shadowtex, vec3 shadowPos) {
-    float depth = texture2D(shadowtex, shadowPos.xy).r;
-    return step(shadowPos.z, depth);
+float texture2DShadow(sampler2D shadowtex, ivec2 pixelCoord, float z) {
+    float depth = texelFetch(shadowtex, pixelCoord, 0).r;
+    return step(z, depth);
 }
 
-vec3 DistortShadow(vec3 shadowPos, float distortFactor) {
-	shadowPos.xy /= distortFactor;
+vec3 DistortShadow(vec3 shadowPos) {
 	shadowPos.z *= 0.2;
 	shadowPos = shadowPos * 0.5 + 0.5;
 
@@ -18,12 +16,13 @@ vec3 DistortShadow(vec3 shadowPos, float distortFactor) {
 }
 
 vec3 SampleBasicShadow(vec3 shadowPos) {
-    float shadow0 = texture2DShadow(shadowtex0, shadowPos);
+    ivec2 pixelCoord = ivec2(shadowPos.xy * float(shadowMapResolution));
+    float shadow0 = texture2DShadow(shadowtex0, pixelCoord, shadowPos.z);
 
     #ifdef SHADOW_COLOR
     if (shadow0 < 0.999) {
-        vec3 shadowCol = texture2D(shadowcolor0, shadowPos.xy).rgb *
-                        texture2DShadow(shadowtex1, shadowPos);
+        vec3 shadowCol = texelFetch(shadowcolor0, pixelCoord, 0).rgb *
+                        texture2DShadow(shadowtex1, pixelCoord, shadowPos.z);
         #ifdef WATER_CAUSTICS
         shadowCol *= 4.0;
         #endif
@@ -42,19 +41,12 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
         #if SHADOW_PIXEL > 0
         worldPos = (floor((worldPos + cameraPosition) * float(SHADOW_PIXEL) + 0.01) + 0.1) / float(SHADOW_PIXEL) - cameraPosition;
         #endif
-        worldPos += worldNormal * 0.01;
+        worldPos += worldNormal * (0.02 * (shadowDistance / 128.0) * (1.0 + 1.0 * clamp(1.0 - NoL, 0.0, 1.0)));
     }
 
     vec3 rawShadowPos = ToShadow(worldPos);
     
-    // Snap distortion steps to the world grid for visual consistency
-    float distb = length(rawShadowPos.xy);
-    #if SHADOW_PIXEL > 0
-    distb = floor(distb * shadowDistance * float(SHADOW_PIXEL) + 0.5) / (shadowDistance * float(SHADOW_PIXEL));
-    #endif
-    float distortFactor = distb * shadowMapBias + (1.0 - shadowMapBias);
-
-    vec3 shadowPos = DistortShadow(rawShadowPos, distortFactor);
+    vec3 shadowPos = DistortShadow(rawShadowPos);
 
     float shadowFade = clamp(100.0 - 100.0 * max(abs(rawShadowPos.x), abs(rawShadowPos.y)), 0.0, 1.0);
 
@@ -69,20 +61,16 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
 
     if (shadowFade < 0.00001) return vec3(1.0);
 
-    float bias = 0.0;
+    float bias = 0.00025;
     
-    float biasFactor = clamp(sqrt(1.0 - NoL * NoL) / (NoL + 0.001), 0.0, 0.1);
-    float distortBias = distortFactor * shadowDistance / 256.0;
-    bias = (distortBias * biasFactor * 0.1 + 0.01) / shadowMapResolution;
-
     #if SHADOW_PIXEL > 0
-    if (isEntity > 1.5) bias += 0.01 / float(SHADOW_PIXEL);
-    else if (isEntity < 0.5) bias += 0.001 / float(SHADOW_PIXEL);
-    else bias += 0.001 / float(SHADOW_PIXEL);
+    if (isEntity > 1.5) bias += 0.001 / float(SHADOW_PIXEL);
+    else if (isEntity < 0.5) bias += 0.0005 / float(SHADOW_PIXEL);
+    else bias += 0.0005 / float(SHADOW_PIXEL);
     #else
-    if (isEntity > 1.5) bias += 0.05 / 16.0;
-    else if (isEntity < 0.5) bias += 0.001 / 16.0;
-    else bias += 0.001 / 16.0;
+    if (isEntity > 1.5) bias += 0.002 / 16.0;
+    else if (isEntity < 0.5) bias += 0.0005 / 16.0;
+    else bias += 0.0005 / 16.0;
     #endif
 
     shadowPos.z -= bias;
@@ -91,7 +79,6 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
 
     return mix(vec3(1.0), shadow, shadowFade);
 }
-#endif
 #else
 vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEntity) {
     #ifdef OVERWORLD

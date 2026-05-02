@@ -33,6 +33,8 @@ struct VoxyFragmentParameters {
 };
 */
 
+uniform float endFlashIntensity;
+
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
 mat4 gbufferModelViewInverse = vxModelViewInv;
@@ -114,11 +116,14 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 	{
 		vec2 lightmap = clamp((parameters.lightMap - 0.03125) * 1.06667, vec2(0.0), vec2(0.9333, 1.0));
 
+		float foliage     = float(blockID >= 100 && blockID < 150);
+		float leaves      = float(blockID == 105 || blockID == 106);
 		float water       = float(blockID == 200 || blockID == 204);
 		float glass       = float(blockID == 201);
 		float translucent = float(blockID == 202);
 		float portal      = 0.0; // Portal is rendered in opaque pass 
 
+		foliage -= leaves;
 		float emission        = portal;
 		vec3 baseReflectance  = vec3(0.04);
 
@@ -233,9 +238,20 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 		vanillaDiffuse*= vanillaDiffuse;
 
-		vec3 shadow = vec3(0.0);
-			GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL,
+		if (foliage > 0.5 || leaves > 0.5) {
+			NoL = mix(0.6, 1.0, step(0.01, NoL));
+			vanillaDiffuse = 1.0;
+		}
+
+		vec3 shadow = vec3(1.0);
+		#ifdef SHADOW
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL,
 			vanillaDiffuse, 1.0, emission, 0.0);
+		#else
+		// Fast path for LODs when shadows are off
+		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
+		albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
+		#endif
 
 
 		float fresnel = pow(clamp(1.0 + dot(newNormal, normalize(viewPos)), 0.0, 1.0), 5.0);

@@ -62,7 +62,6 @@ screen.END_COLOR=End Color
 screen.SELECTION_COLOR=Block Selection Color
 
 screen.CGT=Color Grading & Tonemap
-screen.EXPOSURE=More Exposure Config
 screen.COLOR_GRADING=Color Grading Config
 screen.CG_R=Red Channel
 screen.CG_G=Green Channel
@@ -730,14 +729,6 @@ option.NETHER_VANILLA=Vanilla Nether
 option.NETHER_VANILLA.comment=Use vanilla nether color.
 
 #Color Grading & Tonemap
-option.EXPOSURE=Exposure
-option.EXPOSURE.comment=Adjusts overall brightness.
-
-option.AUTO_EXPOSURE=Auto Exposure
-option.AUTO_EXPOSURE.comment=Enables automatic adjustment to overall brightness.
-
-option.CLASSIC_EXPOSURE=Classic Exposure
-option.CLASSIC_EXPOSURE.comment=Enables increased exposure when going indoors.
 
 option.COLOR_GRADING=Color Grading
 option.COLOR_GRADING.comment=Enables color grading. §e[*]§rThis option doesn't need to be enabled to change tonemap, saturation, and vibrance sliders.
@@ -760,22 +751,6 @@ option.SATURATION.comment=Adjusts saturation of all colors.
 option.VIBRANCE=Vibrance
 option.VIBRANCE.comment=Adjusts saturation of less saturated colors, well saturated colors are less affected.
 
-#More Exposure Config
-option.AUTO_EXPOSURE_RADIUS=Auto Exposure Radius
-option.AUTO_EXPOSURE_RADIUS.comment=Adjusts how much of the screen being used for exposure calculation.
-value.AUTO_EXPOSURE_RADIUS.0.002=Very Low
-value.AUTO_EXPOSURE_RADIUS.0.04=Low
-value.AUTO_EXPOSURE_RADIUS.0.18=Medium
-value.AUTO_EXPOSURE_RADIUS.0.35=High
-value.AUTO_EXPOSURE_RADIUS.0.7=Very High
-
-option.AUTO_EXPOSURE_SPEED=Auto Exposure Speed
-option.AUTO_EXPOSURE_SPEED.comment=Adjusts how fast the exposure change occurs. §c[-]§rFast speed or above may cause flashing in combination with low radius.
-value.AUTO_EXPOSURE_SPEED.0.33=Very Slow
-value.AUTO_EXPOSURE_SPEED.1.00=Slow
-value.AUTO_EXPOSURE_SPEED.3.33=Medium
-value.AUTO_EXPOSURE_SPEED.10.00=Fast
-value.AUTO_EXPOSURE_SPEED.33.33=Very Fast
 
 #Color Grading Config
 option.CG_RR=Red - Red Value

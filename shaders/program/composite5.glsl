@@ -79,6 +79,8 @@ void UnderwaterDistort(inout vec2 texCoord) {
 #include "/lib/color/lightColor.glsl"
 
 
+#include "/lib/post/tonemap.glsl"
+
 void main() {
     vec2 newTexCoord = texCoord;
 
@@ -90,7 +92,7 @@ void main() {
 
 
 
-	color = pow(color, vec3(1.0 / 2.2));
+	Tonemap(color);
 
 	#ifdef MCBL_SS
 	vec3 coloredLight = texture2DLod(colortex9, texCoord.xy, 2).rgb;

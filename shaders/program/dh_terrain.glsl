@@ -174,6 +174,11 @@ void main() {
 		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 			  vanillaDiffuse*= vanillaDiffuse;
+
+		if (foliage > 0.5 || leaves > 0.5) {
+			NoL = mix(0.6, 1.0, step(0.01, NoL));
+			vanillaDiffuse = 1.0;
+		}
 		
 // Removed foliage diffuse boost
 

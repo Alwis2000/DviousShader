@@ -127,13 +127,13 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 		if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0) break;
 
 		#ifdef VOXY
-		traceZ = texture2DLod(depthtex0, pos.xy, 0).r;
+		traceZ = texelFetch(depthtex0, ivec2(pos.xy * vec2(viewWidth, viewHeight)), 0).r;
 		float linZ = traceZ * 2.0 - 1.0;
 		zDelta = -tracePos.z - (- (linZ * gbufferProjectionInverse[2].z + gbufferProjectionInverse[3].z) / (linZ * gbufferProjectionInverse[2].w + gbufferProjectionInverse[3].w));
 
 		if (traceZ >= 1.0) {
 		#endif
-			traceZ = texture2DLod(depthtex, pos.xy, 0).r;
+			traceZ = texelFetch(depthtex, ivec2(pos.xy * vec2(viewWidth, viewHeight)), 0).r;
 
 			float linZ2 = traceZ * 2.0 - 1.0;
 			zDelta = -tracePos.z - (- (linZ2 * projectionInverse[2].z + projectionInverse[3].z) / (linZ2 * projectionInverse[2].w + projectionInverse[3].w));
@@ -247,6 +247,9 @@ void main() {
 	bool isSky = z == 1.0;
 	#ifdef DISTANT_HORIZONS
 	isSky = isSky && (dhZ == 1.0);
+	#endif
+	#ifdef VOXY
+	isSky = isSky && (vxZ == 1.0);
 	#endif
 
 	if (isSky) color.rgb = max(color.rgb - dither / vec3(128.0), vec3(0.0));

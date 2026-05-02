@@ -33,6 +33,8 @@ struct VoxyFragmentParameters {
 };
 */
 
+uniform float endFlashIntensity;
+
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
 mat4 gbufferModelViewInverse = vxModelViewInv;
@@ -142,6 +144,9 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		lightmap.x = 1.0;
 	}
 
+	vec3 normal = vec3(0.0);
+	vec3 newNormal = vec3(0.0);
+
 	{
 		vec3 hsv = vec3(0.0);
 		if (emission > 0.5) {
@@ -152,8 +157,6 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
 		vec3 viewPos = ToNDC(screenPos);
 		vec3 worldPos = mat3(vxModelViewInv) * viewPos + vxModelViewInv[3].xyz;
-
-		vec3 normal = vec3(0.0);
 
 		switch (uint(parameters.face) >> 1u) {
 			case 0u:
@@ -170,7 +173,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 			normal = -normal;
 		}
 
-		vec3 newNormal = normal;
+		newNormal = normal;
 
 		#ifdef TOON_LIGHTMAP
 		lightmap = floor(lightmap * 14.999) / 14.0;
@@ -230,6 +233,11 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 		vanillaDiffuse*= vanillaDiffuse;
+
+		if (foliage > 0.5 || leaves > 0.5) {
+			NoL = mix(0.6, 1.0, step(0.01, NoL));
+			vanillaDiffuse = 1.0;
+		}
 		#endif
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
@@ -237,10 +245,15 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#endif
 
 		float parallaxShadow = 1.0;
-		vec3 shadow = vec3(0.0);
-
+		vec3 shadow = vec3(1.0);
+		#ifdef SHADOW
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, NoL,
 			vanillaDiffuse, parallaxShadow, emission, 0.0);
+		#else
+		// Fast path for LODs when shadows are off
+		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
+		albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
+		#endif
 
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));

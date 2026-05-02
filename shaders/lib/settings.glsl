@@ -29,9 +29,9 @@ Please don't edit anything from Undefine section and onwards.
 
 //Lighting//
   #define SHADOW
-  const int shadowMapResolution = 1536;
+  const int shadowMapResolution = 2048;
   const float shadowDistance = 128.0;
-  const float shadowMapBias = 0.85;
+  const float shadowMapBias = 0.0;
   //#define SHADOW_FILTER
 //#define SHADOW_COLOR
 
@@ -42,7 +42,7 @@ Please don't edit anything from Undefine section and onwards.
   #define SHADOW_LOD
   const float sunPathRotation = -40.0;
   #define SHADOW_BIAS 0
-  #define SHADOW_PIXEL 16
+  #define SHADOW_PIXEL 0
   #define SHADOW_SKY_FALLOFF 0.7333
   // #define CONTACT_SHADOWS 0
 
@@ -162,7 +162,7 @@ Please don't edit anything from Undefine section and onwards.
   #define WATER_FOG 1 //[0 1]
   #define WATER_FOG_DENSITY 1.00 //[0.25 0.50 0.75 1.00 1.50 2.00 2.50 3.00 3.50 4.00]
   #define WATER_CAUSTICS_STRENGTH 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
-  #define WATER_PIXEL 16 //[0 16 32 64 128]
+  #define WATER_PIXEL 0 //[0 16 32 64 128]
 
   #define ANIMATION_STRENGTH 1.00 //[0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
   #define ANIMATION_SPEED 1.00 //[0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.50 3.00 3.50 4.00 5.00 6.00 7.00 8.00]
@@ -362,7 +362,6 @@ Please don't edit anything from Undefine section and onwards.
 //#define EMISSIVE_RECOLOR
 
 //Tonemap & Color Grading//
-  #define EXPOSURE 0.00 //[-2.00 -1.75 -1.50 -1.25 -1.00 -0.75 -0.50 -0.25 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00]
 
 
 

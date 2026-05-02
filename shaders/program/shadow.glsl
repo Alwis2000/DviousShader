@@ -241,10 +241,6 @@ void main() {
 	
 	gl_Position = shadowProjection * shadowModelView * position;
 
-	float dist = sqrt(gl_Position.x * gl_Position.x + gl_Position.y * gl_Position.y);
-	float distortFactor = dist * shadowMapBias + (1.0 - shadowMapBias);
-	
-	gl_Position.xy *= 1.0 / distortFactor;
 	gl_Position.z = gl_Position.z * 0.2;
 }
 
