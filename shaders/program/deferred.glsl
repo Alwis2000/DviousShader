@@ -33,6 +33,7 @@ uniform sampler2D colortex0;
 uniform sampler2D colortex3;
 uniform sampler2D colortex6;
 uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
 uniform sampler2D noisetex;
 
 
@@ -112,7 +113,7 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 	else if (absN.y > absN.x && absN.y > absN.z) lodNormal = vec3(0.0, sign(lodNormal.y), 0.0);
 	else lodNormal = vec3(0.0, 0.0, sign(lodNormal.z));
 
-	vec3 traceOffset = lodNormal * 2.5;
+	vec3 traceOffset = lodNormal * (0.5 * SHADOW_MAP_BIAS);
 	if (dot(traceOffset, lightVec) < 0.0) traceOffset = vec3(0.0);
 
 	vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
@@ -141,7 +142,7 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 		}
 		#endif
 
-		float currentBias = 0.5 + traceStep * 0.02;
+		float currentBias = (0.15 + traceStep * 0.02) * SHADOW_MAP_BIAS;
 		if (zDelta > currentBias && zDelta < (thickness + traceStep * 0.4)) {
 			shadow = 0.0;
 			break;
@@ -358,11 +359,13 @@ void main() {
 
 	float vxZ0 = texture2D(vxDepthTexTrans, texCoord).r;
 
-	vec4 vxScreenPos0 = vec4(texCoord, vxZ0, 1.0);
-	vec4 vxViewPos0 = vxProjInv * (vxScreenPos0 * 2.0 - 1.0);
-	vxViewPos0 /= vxViewPos0.w;
+	float vanillaTransZ = texture2D(depthtex1, texCoord).r;
+	float vxLinearZ = GetLinearDepth(vxZ0, vxProjInv);
+	float vanillaLinearZ = GetLinearDepth(vanillaTransZ, gbufferProjectionInverse);
 
-	color.rgb = mix(color.rgb, voxyTransparentColor.rgb, voxyTransparentColor.a);
+	if (vxLinearZ < vanillaLinearZ) {
+		color.rgb = mix(color.rgb, voxyTransparentColor.rgb, voxyTransparentColor.a);
+	}
 	#endif
 
 	float reflectionMask = float(z < 1.0);

@@ -36,16 +36,25 @@ vec3 SampleBasicShadow(vec3 shadowPos) {
 vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEntity) {
     vec3 worldNormal = mat3(gbufferModelViewInverse) * normal;
 
+    // Shadow Bias calculations
+    float slopeBias = clamp(1.0 - NoL, 0.0, 1.0);
+    float biasMultiplier = SHADOW_MAP_BIAS;
+
+    // Normal Offset Bias
+    float distBias = sqrt(shadowDistance / 128.0);
+    float normalOffset = 0.002 * distBias * (1.0 + slopeBias);
+    if (isEntity > 0.5) normalOffset *= 0.2;
+
+    worldPos += worldNormal * normalOffset * biasMultiplier;
+
     // Grid snapping for blocks (16x16 pixels per block)
     if (isEntity < 0.5) {
         #if SHADOW_PIXEL > 0
         worldPos = (floor((worldPos + cameraPosition) * float(SHADOW_PIXEL) + 0.01) + 0.1) / float(SHADOW_PIXEL) - cameraPosition;
         #endif
-        worldPos += worldNormal * (0.02 * (shadowDistance / 128.0) * (1.0 + 1.0 * clamp(1.0 - NoL, 0.0, 1.0)));
     }
 
     vec3 rawShadowPos = ToShadow(worldPos);
-    
     vec3 shadowPos = DistortShadow(rawShadowPos);
 
     float shadowFade = clamp(100.0 - 100.0 * max(abs(rawShadowPos.x), abs(rawShadowPos.y)), 0.0, 1.0);
@@ -61,19 +70,10 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
 
     if (shadowFade < 0.00001) return vec3(1.0);
 
-    float bias = 0.00025;
-    
-    #if SHADOW_PIXEL > 0
-    if (isEntity > 1.5) bias += 0.001 / float(SHADOW_PIXEL);
-    else if (isEntity < 0.5) bias += 0.0005 / float(SHADOW_PIXEL);
-    else bias += 0.0005 / float(SHADOW_PIXEL);
-    #else
-    if (isEntity > 1.5) bias += 0.002 / 16.0;
-    else if (isEntity < 0.5) bias += 0.0005 / 16.0;
-    else bias += 0.0005 / 16.0;
-    #endif
+    // Depth Bias
+    float bias = 0.00005 * (1.0 + slopeBias);
 
-    shadowPos.z -= bias;
+    shadowPos.z -= bias * biasMultiplier;
 
     vec3 shadow = SampleBasicShadow(shadowPos);
 

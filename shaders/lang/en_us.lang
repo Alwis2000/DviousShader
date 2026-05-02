@@ -156,6 +156,9 @@ option.SHADOW_BIAS.comment=Determines how shadow mapping bias is done. Light dir
 value.SHADOW_BIAS.0=Light Direction
 value.SHADOW_BIAS.1=Surface Normal
 
+option.SHADOW_MAP_BIAS=Shadow Bias Strength
+option.SHADOW_MAP_BIAS.comment=Adjusts the global strength of shadow bias. §e[*]§rHigher values prevent shadow acne but increase "Peter Panning" (floating shadows).
+
 option.SHADOW_PIXEL=Pixel Locked Shadows
 option.SHADOW_PIXEL.comment=Applies pixelation effect on shadows.
 value.SHADOW_PIXEL.0=OFF

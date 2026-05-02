@@ -254,7 +254,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#endif
 
 
-		float fresnel = pow(clamp(1.0 + dot(newNormal, normalize(viewPos)), 0.0, 1.0), 5.0);
+		float fresnel = 0.30;
 
 		if (water > 0.5 || ((translucent + glass) > 0.5 && albedo.a < 0.95)) {
 			#if REFLECTION > 0
@@ -307,17 +307,18 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 			reflection.rgb = max(mix(skyReflection, reflection.rgb, reflection.a), vec3(0.0));
 
 			#if (defined OVERWORLD || defined END) && SPECULAR_HIGHLIGHT == 2
+			vec3 halfVec = normalize(lightVec - normalize(viewPos));
+			float NoH = max(dot(newNormal, halfVec), 0.0);
+			float specular = step(0.985, pow(NoH, 128.0)) * shadow.r;
 			vec3 specularColor = GetSpecularColor(lightmap.y, vec3(1.0));
 
-				vec3 specular = GetSpecularHighlight(newNormal, viewPos,  0.9, vec3(0.02),
-				specularColor, shadow, color.a);
 			#if ALPHA_BLEND == 0
 			float specularAlpha = pow(mix(albedo.a, 1.0, fresnel), 2.2) * fresnel;
 			#else
 			float specularAlpha = mix(albedo.a , 1.0, fresnel) * fresnel;
 			#endif
 
-				reflection.rgb += specular * (1.0 - reflectionMask) / specularAlpha;
+			reflection.rgb += specular * specularColor * 1.5 * (1.0 - reflectionMask) / max(specularAlpha, 0.01);
 			#endif
 
 			albedo.rgb = mix(albedo.rgb, reflection.rgb, fresnel);
@@ -325,6 +326,17 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 
 			#endif
 		}
+
+		#if WATER_FOG == 1
+		if((isEyeInWater == 0 && water > 0.5) || (isEyeInWater == 1 && water < 0.5)) {
+			float opaqueDepth = texture2D(depthtex1, screenPos.xy).r;
+			vec3 opaqueScreenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), opaqueDepth);
+			vec3 opaqueViewPos = ToNDC(opaqueScreenPos);
+
+			vec4 waterFog = GetWaterFog(opaqueViewPos - viewPos.xyz, albedo.rgb);
+			albedo = mix(waterFog, albedo / max(albedo.a, 0.0001), albedo.a);
+		}
+		#endif
 
 		Fog(albedo.rgb, viewPos);
 
