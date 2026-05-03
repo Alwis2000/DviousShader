@@ -241,6 +241,25 @@ void main() {
 	#endif
 	
 	gl_Position = shadowProjection * shadowModelView * position;
+	
+    float r = length(gl_Position.xy);
+    float rCenter = 48.0 / shadowDistance;
+    float densityRatio = (16.0 * 2.0 * shadowDistance) / float(shadowMapResolution);
+    densityRatio = min(densityRatio, 0.95 / rCenter);
+
+    if (r > 0.0001) {
+        float distortedR;
+        if (r < rCenter) {
+            distortedR = r * densityRatio;
+        } else {
+            float r1 = (r - rCenter) / (1.0 - rCenter);
+            float k = SHADOW_DISTORTION;
+            float distorted = r1 / (1.0 - k + k * r1);
+            float start = rCenter * densityRatio;
+            distortedR = mix(start, 1.0, distorted);
+        }
+        gl_Position.xy *= (distortedR / r);
+    }
 
 	gl_Position.z = gl_Position.z * 0.2;
 }
