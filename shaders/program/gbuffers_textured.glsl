@@ -144,8 +144,8 @@ void main() {
 		albedo.rgb = vec3(0.35);
 		#endif
 
-		float NoL = 1.0;
-		//NoL = clamp(dot(normal, lightVec) * 1.01 - 0.01, 0.0, 1.0);
+		float dotNL = 1.0;
+		//dotNL = clamp(dot(normal, lightVec) * 1.01 - 0.01, 0.0, 1.0);
 
 		float NoU = clamp(dot(normal, upVec), -1.0, 1.0);
 		float NoE = clamp(dot(normal, eastVec), -1.0, 1.0);
@@ -158,7 +158,7 @@ void main() {
 		#endif
 		
 		vec3 shadow = vec3(0.0);
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					1.0, 1.0, 0.0, 0.0);
 
 		#if defined FOG && MC_VERSION >= 11500

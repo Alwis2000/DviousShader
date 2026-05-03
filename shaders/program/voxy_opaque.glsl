@@ -219,14 +219,14 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#endif
 
 		#ifdef FLAT_DIRECTIONAL_LIGHTING
-		float NoL = 1.0;
+		float dotNL = 1.0;
 		float vanillaDiffuse = 1.0;
 		#else
 		#ifndef HALF_LAMBERT
-		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
+		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		NoL *= NoL;
+		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		dotNL = dotNL * dotNL;
 		#endif
 
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
@@ -235,7 +235,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		vanillaDiffuse*= vanillaDiffuse;
 
 		if (foliage > 0.5 || leaves > 0.5) {
-			NoL = mix(0.6, 1.0, step(0.01, NoL));
+			dotNL = mix(0.6, 1.0, step(0.01, dotNL));
 			vanillaDiffuse = 1.0;
 		}
 		#endif
@@ -247,12 +247,12 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		float parallaxShadow = 1.0;
 		vec3 shadow = vec3(1.0);
 		#ifdef SHADOW
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, NoL,
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, dotNL,
 			vanillaDiffuse, parallaxShadow, emission, 0.0);
 		#else
 		// Fast path for LODs when shadows are off
 		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
-		albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
+		albedo.rgb *= (dotNL * shadow + 0.2) * vanillaDiffuse;
 		#endif
 
 		#if ALPHA_BLEND == 0

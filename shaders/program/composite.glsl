@@ -375,6 +375,9 @@ void main() {
 	#endif
 
     /*DRAWBUFFERS:01*/
+	#ifdef DEBUG_SSMCBL
+	color.rgb = coloredLight;
+	#endif
 	gl_FragData[0] = color;
 	gl_FragData[1] = vec4(vl, 1.0);
 

@@ -1,22 +1,22 @@
 //GGX area light approximation from Decima Engine: Advances in Lighting and AA presentation
-float GetNoHSquared(float radiusTan, float NoL, float NoV, float VoL) {
+float GetNoHSquared(float radiusTan, float dotNL, float NoV, float VoL) {
     float radiusCos = 1.0 / sqrt(1.0 + radiusTan * radiusTan);
     
-    float RoL = 2.0 * NoL * NoV - VoL;
+    float RoL = 2.0 * dotNL * NoV - VoL;
     if (RoL >= radiusCos)
         return 1.0;
 
     float rOverLengthT = radiusCos * radiusTan / sqrt(1.0 - RoL * RoL);
-    float NoTr = rOverLengthT * (NoV - RoL * NoL);
+    float NoTr = rOverLengthT * (NoV - RoL * dotNL);
     float VoTr = rOverLengthT * (2.0 * NoV * NoV - 1.0 - RoL * VoL);
 
-    float triple = sqrt(clamp(1.0 - NoL * NoL - NoV * NoV - VoL * VoL + 2.0 * NoL * NoV * VoL, 0.0, 1.0));
+    float triple = sqrt(clamp(1.0 - dotNL * dotNL - NoV * NoV - VoL * VoL + 2.0 * dotNL * NoV * VoL, 0.0, 1.0));
     
     float NoBr = rOverLengthT * triple, VoBr = rOverLengthT * (2.0 * triple * NoV);
-    float NoLVTr = NoL * radiusCos + NoV + NoTr, VoLVTr = VoL * radiusCos + 1.0 + VoTr;
+    float NoLVTr = dotNL * radiusCos + NoV + NoTr, VoLVTr = VoL * radiusCos + 1.0 + VoTr;
     float p = NoBr * VoLVTr, q = NoLVTr * VoLVTr, s = VoBr * NoLVTr;    
     float xNum = q * (-0.5 * p + 0.25 * VoBr * NoLVTr);
-    float xDenom = p * p + s * ((s - 2.0 * p)) + NoLVTr * ((NoL * radiusCos + NoV) * VoLVTr * VoLVTr + 
+    float xDenom = p * p + s * ((s - 2.0 * p)) + NoLVTr * ((dotNL * radiusCos + NoV) * VoLVTr * VoLVTr + 
                    q * (-0.5 * (VoLVTr + VoL * radiusCos) - 0.5));
     float twoX1 = 2.0 * xNum / (xDenom * xDenom + xNum * xNum);
     float sinTheta = twoX1 * xDenom;
@@ -24,7 +24,7 @@ float GetNoHSquared(float radiusTan, float NoL, float NoV, float VoL) {
     NoTr = cosTheta * NoTr + sinTheta * NoBr;
     VoTr = cosTheta * VoTr + sinTheta * VoBr;
     
-    float newNoL = NoL * radiusCos + NoTr;
+    float newNoL = dotNL * radiusCos + NoTr;
     float newVoL = VoL * radiusCos + VoTr;
     float NoH = NoV + newNoL;
     float HoH = 2.0 * newVoL + 2.0;
@@ -42,10 +42,10 @@ float GGXTrowbridgeReitz(float NoHsqr, float roughness){
 
 //GGXTrowbridgeReitz D function
 
-float SchlickGGX(float NoL, float NoV, float roughness){
+float SchlickGGX(float dotNL, float NoV, float roughness){
     float k = roughness * 0.5;
     
-    float smithL = 0.5 / (NoL * (1.0 - k) + k);
+    float smithL = 0.5 / (dotNL * (1.0 - k) + k);
     float smithV = 0.5 / (NoV * (1.0 - k) + k);
 
 	return smithL * smithV;
@@ -63,11 +63,11 @@ vec3 GGX(vec3 normal, vec3 viewPos, float smoothness, vec3 baseReflectance, floa
     vec3 halfVec = normalize(lightVec + viewPos);
 
     float HoL = clamp(dot(halfVec, lightVec), 0.0, 1.0);
-    float NoL = clamp(dot(normal,  lightVec), 0.0, 1.0);
+    float dotNL = clamp(dot(normal,  lightVec), 0.0, 1.0);
     float NoV = clamp(dot(normal,  viewPos), -1.0, 1.0);
     float VoL = dot(lightVec, viewPos);
 
-    float NoHsqr = GetNoHSquared(sunSize, NoL, NoV, VoL);
+    float NoHsqr = GetNoHSquared(sunSize, dotNL, NoV, VoL);
     if (NoV < 0.0){
         NoHsqr = dot(normal, halfVec);
         NoHsqr *= NoHsqr;
@@ -76,13 +76,13 @@ vec3 GGX(vec3 normal, vec3 viewPos, float smoothness, vec3 baseReflectance, floa
     
     float D = GGXTrowbridgeReitz(NoHsqr, roughness);
     vec3  F = SphericalGaussianFresnel(HoL, baseReflectance);
-    float G = SchlickGGX(NoL, NoV, roughness);
+    float G = SchlickGGX(dotNL, NoV, roughness);
     
     float Fl = max(length(F), 0.001);
     vec3  Fn = F / Fl;
 
     float specular = D * Fl * G;
-    vec3 specular3 = specular / (1.0 + 0.03125 / 4.0 * specular) * Fn * NoL;
+    vec3 specular3 = specular / (1.0 + 0.03125 / 4.0 * specular) * Fn * dotNL;
 
     #ifndef SPECULAR_HIGHLIGHT_ROUGH
     specular3 *= 1.0 - roughness * roughness;

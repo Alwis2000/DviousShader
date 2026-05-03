@@ -116,7 +116,7 @@ void main() {
 
 		vec3 rawAlbedo = albedo.rgb;
 
-		float NoL = clamp(dot(normal, lightVec) * 1.01 - 0.01, 0.0, 1.0);
+		float dotNL = clamp(dot(normal, lightVec) * 1.01 - 0.01, 0.0, 1.0);
 
 		float NoU = clamp(dot(normal, upVec), -1.0, 1.0);
 		float NoE = clamp(dot(normal, eastVec), -1.0, 1.0);
@@ -128,7 +128,7 @@ void main() {
 		#endif
 		
 		vec3 shadow = vec3(0.0);
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					vanillaDiffuse, 1.0, 0.0, 0.0);
 		
 		if (isSelection > 0.5) {

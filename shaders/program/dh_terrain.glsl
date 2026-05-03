@@ -50,6 +50,16 @@ uniform mat4 shadowModelView;
 
 uniform sampler2D noisetex;
 
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+uniform sampler3D lighttex0;
+uniform sampler3D lighttex1;
+#endif
+
+#ifdef MCBL_SS
+uniform sampler2D colortex8;
+uniform sampler2D colortex9;
+#endif
+
 //Common Variables//
 float eBS = eyeBrightnessSmooth.y / 240.0;
 float sunVisibility  = clamp(dot( sunVec, upVec) * 10.0 + 0.5, 0.0, 1.0);
@@ -103,6 +113,10 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
 #include "/lib/util/encode.glsl"
+
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+#include "/lib/lighting/coloredBlocklight.glsl"
+#endif
 
 
 //Program//
@@ -164,10 +178,10 @@ void main() {
 		vec3 outNormal = newNormal;
 		
 		#ifndef HALF_LAMBERT
-		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
+		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		NoL *= NoL;
+		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		dotNL = dotNL * dotNL;
 		#endif
 
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
@@ -176,21 +190,31 @@ void main() {
 			  vanillaDiffuse*= vanillaDiffuse;
 
 		if (foliage > 0.5 || leaves > 0.5) {
-			NoL = mix(0.6, 1.0, step(0.01, NoL));
+			dotNL = mix(0.6, 1.0, step(0.01, dotNL));
 			vanillaDiffuse = 1.0;
 		}
 		
-// Removed foliage diffuse boost
+		vec3 lightAlbedo = albedo.rgb + 0.00001;
+		#ifdef MCBL_SS
+		if (lava > 0.5) {
+			lightAlbedo = pow(lightAlbedo, vec3(0.25));
+		}
+		lightAlbedo = sqrt(normalize(lightAlbedo) * emission);
+		#endif
+		
+		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos.xyz, worldPos, newNormal, 0.0, lightmap.x);
+		#endif
 
 		
 		vec3 shadow = vec3(1.0);
 		#ifdef SHADOW
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					vanillaDiffuse, 1.0, emission, 0.0);
 		#else
 		// Fast path for DH when shadows are off
 		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
-		albedo.rgb *= (NoL * shadow + 0.2) * vanillaDiffuse;
+		albedo.rgb *= (dotNL * shadow + 0.2) * vanillaDiffuse;
 		#endif
 
 		#if ALPHA_BLEND == 0
@@ -207,9 +231,13 @@ void main() {
 		#endif
 	}
 
-	/* DRAWBUFFERS:06 */
+	/* DRAWBUFFERS:068 */
     gl_FragData[0] = albedo;
 	gl_FragData[1] = vec4(EncodeNormal(newNormal), shadowMask, 1.0);
+
+	#ifdef MCBL_SS
+	gl_FragData[2] = vec4(lightAlbedo, 1.0);
+	#endif
 }
 
 #endif

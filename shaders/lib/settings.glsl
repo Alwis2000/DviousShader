@@ -60,9 +60,10 @@ Please don't edit anything from Undefine section and onwards.
   #define MCBL_DISTANCE 128 //[128 192 256 384 512]
   #define MCBL_HALF_HEIGHT
 //#define MCBL_RANDOM
-//#define MCBL_SS
+#define MCBL_SS
   #define MCBL_SS_MODE 0 //[0 1]
 //#define MCBL_SS_ANTI_BLEED
+// #define DEBUG_SSMCBL
 
 //Material//
 

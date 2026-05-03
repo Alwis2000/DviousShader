@@ -3,7 +3,7 @@
 #endif
 
 void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos, vec3 normal, 
-                 vec2 lightmap, float smoothLighting, float NoL, float vanillaDiffuse,
+                 vec2 lightmap, float smoothLighting, float dotNL, float vanillaDiffuse,
                  float parallaxShadow, float emission, float isEntity) {
     smoothLighting = 1.0;
 
@@ -11,15 +11,15 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     float skylightSqr = lightmap.y * lightmap.y;
 
     #ifdef FLAT_DIRECTIONAL_LIGHTING
-    if (isEntity < 0.5) NoL = 1.0;
+    if (isEntity < 0.5) dotNL = 1.0;
     #endif
 
     #if defined OVERWORLD || defined END
-    shadow = GetShadow(worldPos, normal, NoL, lightmap.y, isEntity);
+    shadow = GetShadow(worldPos, normal, dotNL, lightmap.y, isEntity);
     shadow *= parallaxShadow;
     
     #ifdef SHADOW
-    vec3 fullShadow = max(shadow * NoL, vec3(0.0));
+    vec3 fullShadow = max(shadow * dotNL, vec3(0.0));
     #else
     vec3 fullShadow = vec3(shadow);
     #ifdef OVERWORLD

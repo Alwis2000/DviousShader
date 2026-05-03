@@ -101,10 +101,10 @@ void main() {
     albedo.rgb = pow(albedo.rgb, vec3(2.2));
 
     #ifndef HALF_LAMBERT
-    float NoL = clamp(dot(normal, lightVec), 0.0, 1.0);
+    float dotNL = clamp(dot(normal, lightVec), 0.0, 1.0);
     #else
-    float NoL = clamp(dot(normal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-    NoL *= NoL;
+    float dotNL = clamp(dot(normal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+    dotNL = dotNL * dotNL;
     #endif
 
     #if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
@@ -112,7 +112,7 @@ void main() {
     #endif
 
     vec3 shadow = vec3(0.0);
-    GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+    GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
                 1.0, 1.0, 0.0, 0.0);
 
     #if ALPHA_BLEND == 0

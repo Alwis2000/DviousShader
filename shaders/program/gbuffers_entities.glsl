@@ -136,6 +136,7 @@ void main() {
 	vec3 newNormal = normal;
 	float smoothness = 0.0;
 	float skyOcclusion = 0.0;
+	float emission = 0.0;
 
 
 	#ifdef ENTITY_FLASH
@@ -166,7 +167,7 @@ void main() {
 		float endCrystal = float(entityId == 10102);
 		float endBeam = float(entityId == 10103);
 		
-		float emission       = float(entityColor.a > 0.05) * 0.125 + endCrystal;
+		emission       = float(entityColor.a > 0.05) * 0.125 + endCrystal;
 		vec3 baseReflectance = vec3(0.04);
 		
 		vec3 hsv = vec3(0.0);
@@ -244,12 +245,17 @@ void main() {
 		#endif
 	}
 
-    vec3 lightAlbedo = albedo.rgb;
-
-		/* DRAWBUFFERS:018 */
+		/* DRAWBUFFERS:016 */
 		gl_FragData[0] = albedo;
-		gl_FragData[1] = vec4(lightAlbedo, 1.0);
+		gl_FragData[1] = vec4(vlAlbedo, 1.0);
 		gl_FragData[2] = vec4(smoothness, skyOcclusion, entityMask, 1.0);
+
+		#ifdef MCBL_SS
+		/* DRAWBUFFERS:0168 */
+		vec3 lightAlbedo = albedo.rgb;
+		lightAlbedo = sqrt(normalize(lightAlbedo + 1e-5) * emission);
+		gl_FragData[3] = vec4(lightAlbedo, 1.0);
+		#endif
 }
 
 #endif

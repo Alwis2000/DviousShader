@@ -130,6 +130,7 @@ void main() {
 	vec3 newNormal = normal;
 	float smoothness = 0.0;
 	float skyOcclusion = 0.0;
+	float emission = 0.0;
 
 
 	#ifdef ENTITY_FLASH
@@ -154,7 +155,7 @@ void main() {
 	if (lightningBolt < 0.5) {
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
 		
-		float emission       = float(entityColor.a > 0.05);
+		emission       = float(entityColor.a > 0.05);
 		vec3 baseReflectance = vec3(0.04);
 		
 		vec3 hsv = RGB2HSV(albedo.rgb);
@@ -188,10 +189,10 @@ void main() {
 		#endif
 		
 		#ifndef HALF_LAMBERT
-		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
+		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		NoL *= NoL;
+		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		dotNL = dotNL * dotNL;
 		#endif
 
 		float vanillaDiffuse = 1.05; // Standardized to match terrain (with 1.05x compensation)
@@ -211,7 +212,7 @@ void main() {
 		#endif
 		
 		vec3 shadow = vec3(0.0);
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					vanillaDiffuse, parallaxShadow, emission, 1.0);
 
 
@@ -230,9 +231,9 @@ void main() {
 
 	#ifdef MCBL_SS
 		/* DRAWBUFFERS:0138 */
-		gl_FragData[3] = vec4(0.0,0.0,0.0,1.0);
-		
-	#else
+		vec3 lightAlbedo = albedo.rgb;
+		lightAlbedo = sqrt(normalize(lightAlbedo + 1e-5) * emission);
+		gl_FragData[3] = vec4(lightAlbedo, 1.0);
 	#endif
 }
 

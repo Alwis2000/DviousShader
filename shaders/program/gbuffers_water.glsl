@@ -313,10 +313,10 @@ void main() {
 		vlAlbedo = mix(vec3(1.0), vlAlbedo, sqrt(albedo.a)) * (1.0 - pow(albedo.a, 64.0));
 		
 		#ifndef HALF_LAMBERT
-		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
+		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		NoL *= NoL;
+		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		dotNL = dotNL * dotNL;
 		#endif
 
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
@@ -331,7 +331,7 @@ void main() {
 		#endif
 		
 		vec3 shadow = vec3(0.0);
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
 		

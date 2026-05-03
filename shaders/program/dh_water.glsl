@@ -56,6 +56,16 @@ uniform sampler2D depthtex1;
 uniform sampler2D noisetex;
 uniform sampler2D dhDepthTex1;
 
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+uniform sampler3D lighttex0;
+uniform sampler3D lighttex1;
+#endif
+
+#ifdef MCBL_SS
+uniform sampler2D colortex8;
+uniform sampler2D colortex9;
+#endif
+
 
 
 #ifdef VOXY
@@ -111,6 +121,10 @@ float GetLuminance(vec3 color) {
 #include "/lib/reflections/simpleReflections.glsl"
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
+
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+#include "/lib/lighting/coloredBlocklight.glsl"
+#endif
 
 
 //Program//
@@ -220,10 +234,10 @@ void main() {
 		vlAlbedo = mix(vec3(1.0), vlAlbedo, sqrt(albedo.a)) * (1.0 - pow(albedo.a, 64.0));
 		
 		#ifndef HALF_LAMBERT
-		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
+		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		NoL *= NoL;
+		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		dotNL = dotNL * dotNL;
 		#endif
 
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
@@ -232,7 +246,17 @@ void main() {
 			  vanillaDiffuse*= vanillaDiffuse;
 
 		vec3 shadow = vec3(0.0);
-		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, NoL, 
+		
+		lightAlbedo = albedo.rgb + 0.00001;
+		#ifdef MCBL_SS
+		lightAlbedo = sqrt(normalize(lightAlbedo) * emission);
+		#endif
+
+		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos.xyz, worldPos, newNormal, 0.0, lightmap.x);
+		#endif
+
+		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, dotNL, 
 					vanillaDiffuse, 1.0, emission, 0.0);
 		
 		float fresnel = pow(clamp(1.0 + dot(newNormal, normalize(viewPos)), 0.0, 1.0), 5.0);
@@ -326,9 +350,13 @@ void main() {
 	}
 
 
-    /* DRAWBUFFERS:01 */
+    /* DRAWBUFFERS:018 */
     gl_FragData[0] = albedo;
 	gl_FragData[1] = vec4(vlAlbedo, 1.0);
+
+	#ifdef MCBL_SS
+	gl_FragData[2] = vec4(lightAlbedo, 1.0);
+	#endif
 }
 
 #endif

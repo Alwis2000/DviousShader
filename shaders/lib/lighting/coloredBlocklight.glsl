@@ -1,3 +1,5 @@
+#include "/lib/util/palette.glsl"
+
 vec3 ApplyHandlightColor(vec3 mcblCol, vec3 worldPos) {
     vec3 heldLightPos = worldPos + relativeEyePosition + vec3(0.0, 0.5, 0.0);
 
@@ -88,17 +90,20 @@ vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldP
 
 	#ifdef MCBL_SS
 	if (hand < 0.5) {
-		screenPos.xy = Reprojection(screenPos);
+		screenPos.xy = Reprojection(screenPos.xyz);
 	}
 
 	vec3 ssmcblCol = texture2DLod(colortex9, screenPos.xy, 2).rgb;
 	float ssmcblFactor = min((ssmcblCol.r + ssmcblCol.g + ssmcblCol.b) * 2048.0, 1.0);
 
 	#if MCBL_SS_MODE == 0 && defined MULTICOLORED_BLOCKLIGHT
-	ssmcblFactor *= 1.0 - voxelBounds;
+	// Only dim the screen-space light if the voxel light is actually contributing.
+	// This prevents "orange flickers" when entering the voxel range before data is ready.
+	float mcblIntensity = min(dot(mcblCol, vec3(1.0)) * 1000.0, 1.0);
+	ssmcblFactor *= 1.0 - (voxelBounds * mcblIntensity);
 	#endif
 	
-	ssmcblCol = ssmcblCol + 0.000001;
+	ssmcblCol = GetNearestPaletteColor(ssmcblCol);
 	ssmcblCol = normalize(ssmcblCol * ssmcblCol) * 0.875 + 0.125;
 	ssmcblCol *= BLOCKLIGHT_I * BLOCKLIGHT_I * 1.5;
 
