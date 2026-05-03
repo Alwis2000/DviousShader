@@ -57,18 +57,7 @@ void main() {
 
 	vec3 color = texture2DLod(colortex1, newTexCoord, 0).rgb;
 
-	#if CHROMATIC_ABERRATION > 0
-	float caStrength = 0.002 * CHROMATIC_ABERRATION;
-	
-	vec2 caScale = vec2(1.0 / aspectRatio, 1.0);
-	color *= vec3(0.0,1.0,0.0);
-	color += texture2DLod(colortex1, mix(newTexCoord, vec2(0.5), caScale * -caStrength), 0).rgb * vec3(1.0,0.0,0.0);
-	color += texture2DLod(colortex1, mix(newTexCoord, vec2(0.5), caScale * -caStrength * 0.5), 0).rgb * vec3(0.5,0.5,0.0);
-	color += texture2DLod(colortex1, mix(newTexCoord, vec2(0.5), caScale * caStrength * 0.5), 0).rgb * vec3(0.0,0.5,0.5);
-	color += texture2DLod(colortex1, mix(newTexCoord, vec2(0.5), caScale* caStrength), 0).rgb * vec3(0.0,0.0,1.0);
 
-	color /= vec3(1.5,2.0,1.5);
-	#endif
 	
 
 

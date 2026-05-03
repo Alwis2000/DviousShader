@@ -194,7 +194,7 @@ Please don't edit anything from Undefine section and onwards.
   #define WEATHER_OPACITY 1.00 //[0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.50 5.00 5.50 6.00 6.50 7.00 7.50 8.00]
   #define DH_OVERDRAW 1.0 //[1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0]
 
-  #define CHROMATIC_ABERRATION 0 //[0 1 2 3 4]
+
   #define UNDERWATER_DISTORTION
 
 

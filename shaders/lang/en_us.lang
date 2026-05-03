@@ -590,13 +590,7 @@ option.MOTION_BLUR_STRENGTH.comment=Adjusts motion blur intensity.
 
 
 
-option.CHROMATIC_ABERRATION=Chromatic Aberration
-option.CHROMATIC_ABERRATION.comment=Adds color distortion around the borders.
-value.CHROMATIC_ABERRATION.0=OFF
-value.CHROMATIC_ABERRATION.1=Very Weak
-value.CHROMATIC_ABERRATION.2=Weak
-value.CHROMATIC_ABERRATION.3=Moderate
-value.CHROMATIC_ABERRATION.4=Strong
+
 
 option.UNDERWATER_DISTORTION=Underwater Distortion
 option.UNDERWATER_DISTORTION.comment=Applies screen distortion while underwater.
