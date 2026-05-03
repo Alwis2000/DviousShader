@@ -34,7 +34,7 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     
     #ifdef OVERWORLD
     float shadowMult = (1.0 - 0.95 * rainStrength) * shadowFade;
-    float toonShadow = fullShadow.r * shadowMult;
+    vec3 toonShadow = fullShadow * shadowMult;
     
     vec3 shadowToning = mix(vec3(1.0), vec3(1.05, 0.8, 1.3), sunVisibility * (1.0 - rainStrength * 0.5));
     vec3 minIndigo = vec3(0.12, 0.12, 0.18) * (sunVisibility * sunVisibility);

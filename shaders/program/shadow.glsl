@@ -135,8 +135,9 @@ void main() {
 		#endif
 	}
 
-    albedo.rgb = mix(vec3(1.0), albedo.rgb, 1.0 - pow(1.0 - albedo.a, 1.5));
-	albedo.rgb *= 1.0 - pow(albedo.a, 96.0);
+    float shadowDensity = 1.0 - pow(1.0 - albedo.a, 2.0); // Stronger attenuation
+    albedo.rgb = mix(vec3(0.5), albedo.rgb, 0.8) * (1.0 - shadowDensity * 0.5);
+    albedo.rgb *= 1.0 - pow(albedo.a, 96.0); // Opaque blocks write black
 
 	#ifdef WATER_CAUSTICS
 	albedo.rgb *= 0.25;
