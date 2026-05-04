@@ -11,6 +11,7 @@ https://capttatsu.com
 #define VOXY_PATCH
 #define texture2D texture
 #define texture2DLod textureLod
+#define endFlashIntensity 0.0
 
 layout(location = 0) out vec4 gbufferData0;
 layout(location = 1) out vec4 gbufferData1;
@@ -33,7 +34,7 @@ struct VoxyFragmentParameters {
 };
 */
 
-uniform float endFlashIntensity;
+// uniform float endFlashIntensity;
 
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
@@ -92,6 +93,7 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 #include "/lib/color/skyColor.glsl"
 #include "/lib/color/specularColor.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/util/encode.glsl"
 #include "/lib/util/spaceConversion.glsl"
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
@@ -264,12 +266,12 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		shadowMask *= lightmap.y * lightmap.y;
 
 		#ifdef OVERWORLD
-		shadowMask *= (1.0 - 0.95 * rainStrength) * shadowFade;
+		shadowMask *= (1.0 - 0.95 * rainStrength);
 		#endif
 	}
 
 	gbufferData0 = albedo;
-	gbufferData1 = vec4(EncodeNormal(newNormal), shadowMask, 1.0);
+	gbufferData1 = vec4(EncodeNormal(newNormal), shadowMask, lightmap.y);
 
 	#ifdef MCBL_SS
 	gbufferData2 = vec4(lightAlbedo, 1.0);

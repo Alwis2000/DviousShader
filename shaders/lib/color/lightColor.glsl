@@ -54,8 +54,5 @@ vec3 ambientColRaw = mix(ambientNight, ambientSun, sunVisibility);
 vec3 ambientColSqrt = mix(ambientColRaw, dot(ambientColRaw, vec3(0.299, 0.587, 0.114)) * weatherCol.rgb, rainStrength);
 vec3 ambientCol = ambientColSqrt * ambientColSqrt;
 
-// vec3 lightSun   = CalcSunColor(lightMorning, lightDay, lightEvening);
-// vec3 ambientSun = CalcSunColor(ambientMorning, ambientDay, ambientEvening);
-
-// vec3 lightCol   = CalcLightColor(lightSun, lightNight, weatherCol.rgb);
-// vec3 ambientCol = CalcLightColor(ambientSun, ambientNight, weatherCol.rgb);
+vec3 shadowToning = mix(vec3(1.0), vec3(1.05, 0.8, 1.3), sunVisibility * (1.0 - rainStrength * 0.5));
+vec3 minIndigo = vec3(0.12, 0.12, 0.18) * (sunVisibility * sunVisibility);

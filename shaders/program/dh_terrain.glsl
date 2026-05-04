@@ -227,18 +227,19 @@ void main() {
 		shadowMask *= lightmap.y * lightmap.y;
 
 		#ifdef OVERWORLD
-		shadowMask *= (1.0 - 0.95 * rainStrength) * shadowFade;
+		shadowMask *= (1.0 - 0.95 * rainStrength);
 		#endif
 	}
 
-	/* DRAWBUFFERS:068 */
+	/* DRAWBUFFERS:038 */
     gl_FragData[0] = albedo;
-	gl_FragData[1] = vec4(EncodeNormal(newNormal), shadowMask, 1.0);
+	gl_FragData[1] = vec4(EncodeNormal(newNormal), shadowMask, lmCoord.y);
 
 	#ifdef MCBL_SS
 	gl_FragData[2] = vec4(lightAlbedo, 1.0);
 	#endif
 }
+
 
 #endif
 

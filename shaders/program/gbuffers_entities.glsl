@@ -55,6 +55,7 @@ uniform float endFlashIntensity;
 uniform float near, far;
 uniform float nightVision;
 uniform float screenBrightness; 
+uniform float shadowDistanceUniform;
 uniform float shadowFade;
 uniform float viewWidth, viewHeight;
 
@@ -104,6 +105,8 @@ float GetLuminance(vec3 color) {
 #include "/lib/lighting/forwardLighting.glsl"
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
+#include "/lib/util/encode.glsl"
+
 
 
 
@@ -129,14 +132,16 @@ float GetLuminance(vec3 color) {
 
 //Program//
 void main() {
+	vec3 newNormal = normal;
+	float emission = 0.0;
+	float shadowMask = 1.0;
+	vec3 shadow = vec3(1.0);
+	vec3 lightAlbedo = vec3(0.0);
+
     vec4 albedo = texture2D(texture, texCoord) * color;
 	if (albedo.a < 0.5) discard;
 
 	vec3 vlAlbedo = albedo.rgb;
-	vec3 newNormal = normal;
-	float smoothness = 0.0;
-	float skyOcclusion = 0.0;
-	float emission = 0.0;
 
 
 	#ifdef ENTITY_FLASH
@@ -232,7 +237,7 @@ void main() {
 		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0, lightmap.x);
 		#endif
 
-		vec3 shadow = vec3(0.0);
+		shadow = vec3(0.0);
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 1.0);
 
@@ -243,20 +248,32 @@ void main() {
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
 		#endif
+
+		shadowMask = shadow.r * (1.0 - emission) * lightmap.y * lightmap.y;
+		#ifdef OVERWORLD
+		shadowMask *= (1.0 - 0.95 * rainStrength);
+		#endif
 	}
 
-		/* DRAWBUFFERS:016 */
-		gl_FragData[0] = albedo;
-		gl_FragData[1] = vec4(vlAlbedo, 1.0);
-		gl_FragData[2] = vec4(smoothness, skyOcclusion, entityMask, 1.0);
+	float smoothness = 0.0;
+	float skyOcclusion = 0.0;
 
-		#ifdef MCBL_SS
-		/* DRAWBUFFERS:0168 */
-		vec3 lightAlbedo = albedo.rgb;
-		lightAlbedo = sqrt(normalize(lightAlbedo + 1e-5) * emission);
-		gl_FragData[3] = vec4(lightAlbedo, 1.0);
-		#endif
+	/* DRAWBUFFERS:0163 */
+	gl_FragData[0] = albedo;
+	gl_FragData[1] = vec4(vlAlbedo, 1.0);
+	gl_FragData[2] = vec4(smoothness, skyOcclusion, entityMask, 1.0);
+	gl_FragData[3] = vec4(EncodeNormal(newNormal), shadowMask, lmCoord.y);
+
+	#ifdef MCBL_SS
+	/* DRAWBUFFERS:01638 */
+	vec3 lightAlbedoOutput = albedo.rgb;
+	lightAlbedoOutput = sqrt(normalize(lightAlbedoOutput + 1e-5) * emission);
+	gl_FragData[4] = vec4(lightAlbedoOutput, 1.0);
+	#endif
 }
+
+
+
 
 #endif
 

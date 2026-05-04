@@ -8,14 +8,16 @@
 	"excludeLodsFromVanillaDepth": true,
 	"opaqueDrawBuffers": [
 		0,
-		6
+		3
 		#ifdef MCBL_SS
 		,8
 		#endif
 	],
+
 	"translucentDrawBuffers": [
 		16,
-		1
+		1,
+		3
 		#ifdef MCBL_SS
 		,8
 		#endif
@@ -52,7 +54,6 @@
 		"blindFactor",
 
 		"darknessFactor",
-		"endFlashIntensity",
 		"far",
 		"frameTimeCounter",
 		"nightVision",

@@ -189,6 +189,8 @@ vec3 DrawEndPortal(vec3 worldPos, vec3 worldNormal, float dither) {
 #include "/lib/lighting/forwardLighting.glsl"
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
+#include "/lib/util/encode.glsl"
+
 
 //Includes//
 
@@ -207,10 +209,13 @@ vec3 DrawEndPortal(vec3 worldPos, vec3 worldNormal, float dither) {
 
 //Program//
 void main() {
-    vec4 albedo = texture2D(texture, texCoord) * vColor;
 	vec3 newNormal = normal;
-	float smoothness = 0.0;
+	float emission = 0.0;
+	float shadowMask = 1.0;
+	vec3 shadow = vec3(1.0);
 	vec3 lightAlbedo = vec3(0.0);
+
+    vec4 albedo = texture2D(texture, texCoord) * vColor;
 	
 	#if MC_VERSION >= 11300
 	int blockID = blockEntityId / 100;
@@ -223,7 +228,7 @@ void main() {
 	if (endPortal < 0.5) {
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
 		
-		float emission        = float(blockID == 155);
+		emission = float(blockID == 155);
 		vec3 baseReflectance  = vec3(0.04);
 		
 		vec3 hsv = vec3(0.0);
@@ -282,7 +287,7 @@ void main() {
 		blocklightCol = ApplyMultiColoredBlocklight(blocklightCol, screenPos, worldPos, newNormal, 0.0, lightmap.x);
 		#endif
 		
-		vec3 shadow = vec3(0.0);
+		shadow = vec3(0.0);
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, vColor.a, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 1.0);
 
@@ -313,10 +318,25 @@ void main() {
 		#endif
 	}
 
-	/* DRAWBUFFERS:08 */
+	if (endPortal < 0.5) {
+		shadowMask = shadow.r * (1.0 - emission) * clamp(lmCoord.y * lmCoord.y, 0.0, 1.0);
+		#ifdef OVERWORLD
+		shadowMask *= (1.0 - 0.95 * rainStrength);
+		#endif
+	} else {
+		shadowMask = 0.0; // Emissive portal
+	}
+
+	/* DRAWBUFFERS:083 */
 	gl_FragData[0] = albedo;
 	gl_FragData[1] = vec4(lightAlbedo, 1.0);
+	gl_FragData[2] = vec4(EncodeNormal(newNormal), shadowMask, lmCoord.y);
 }
+
+
+
+
+
 
 #endif
 

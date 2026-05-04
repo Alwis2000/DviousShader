@@ -11,11 +11,13 @@ https://capttatsu.com
 #define VOXY_PATCH
 #define texture2D texture
 #define texture2DLod textureLod
+#define endFlashIntensity 0.0
 
 layout(location = 0) out vec4 gbufferData0;
 layout(location = 1) out vec4 gbufferData1;
-#ifdef MCBL_SS
 layout(location = 2) out vec4 gbufferData2;
+#ifdef MCBL_SS
+layout(location = 3) out vec4 gbufferData3;
 #endif
 
 #undef MULTICOLORED_BLOCKLIGHT
@@ -33,7 +35,7 @@ struct VoxyFragmentParameters {
 };
 */
 
-uniform float endFlashIntensity;
+// uniform float endFlashIntensity;
 
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
@@ -77,6 +79,7 @@ float GetLuminance(vec3 color) {
 #include "/lib/color/specularColor.glsl"
 #include "/lib/color/waterColor.glsl"
 #include "/lib/util/dither.glsl"
+#include "/lib/util/encode.glsl"
 #include "/lib/util/spaceConversion.glsl"
 #include "/lib/atmospherics/weatherDensity.glsl"
 #include "/lib/atmospherics/sky.glsl"
@@ -128,10 +131,10 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		vec3 baseReflectance  = vec3(0.04);
 
 		vec3 hsv = vec3(0.0);
-		if (emission > 0.5) {
-			hsv = RGB2HSV(albedo.rgb);
-			emission *= GetHardcodedEmission(albedo.rgb, hsv);
-		}
+			if (emission > 0.5) {
+				hsv = RGB2HSV(albedo.rgb);
+				emission *= GetHardcodedEmission(albedo.rgb, hsv);
+			}
 
 		vec3 screenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), gl_FragCoord.z);
 		vec3 viewPos = ToNDC(screenPos);
@@ -333,6 +336,9 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#if WATER_FOG == 1
 		if((isEyeInWater == 0 && water > 0.5) || (isEyeInWater == 1 && water < 0.5)) {
 			float opaqueDepth = texture2D(depthtex1, screenPos.xy).r;
+			float vxOpaqueDepth = texture2D(vxDepthTexOpaque, screenPos.xy).r;
+			opaqueDepth = min(opaqueDepth, vxOpaqueDepth);
+
 			vec3 opaqueScreenPos = vec3(gl_FragCoord.xy / vec2(viewWidth, viewHeight), opaqueDepth);
 			vec3 opaqueViewPos = ToNDC(opaqueScreenPos);
 
@@ -346,16 +352,16 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
 		#endif
+		gbufferData0 = albedo;
+		gbufferData1 = vec4(vlAlbedo, 1.0);
 
+		float shadowMask = shadow.r * clamp(lightmap.y * lightmap.y, 0.0, 1.0);
+		gbufferData2 = vec4(EncodeNormal(newNormal), shadowMask, lightmap.y);
+
+		#ifdef MCBL_SS
+		gbufferData3 = vec4(lightAlbedo, 1.0);
+		#endif
 	}
-
-
-	gbufferData0 = albedo;
-	gbufferData1 = vec4(vlAlbedo, 1.0);
-
-	#ifdef MCBL_SS
-	gbufferData2 = vec4(lightAlbedo, 1.0);
-	#endif
 }
 
 #endif

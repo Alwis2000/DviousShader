@@ -1,3 +1,6 @@
+#ifndef ENCODE_GLSL
+#define ENCODE_GLSL
+
 //Spheremap Transform from https://aras-p.info/texts/CompactNormalStorage.html
 vec2 EncodeNormal(vec3 n) {
     float f = sqrt(n.z * 8.0 + 8.0);
@@ -13,3 +16,5 @@ vec3 DecodeNormal(vec2 enc) {
     n.z = 1.0 - f / 2.0;
     return n;
 }
+
+#endif
