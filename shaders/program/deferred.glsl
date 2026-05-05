@@ -20,7 +20,7 @@ uniform float frameTimeCounter;
 uniform float rainStrength;
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
-uniform float viewWidth, viewHeight, aspectRatio;
+#include "/lib/common_uniforms.glsl"
 
 uniform ivec2 eyeBrightnessSmooth;
 

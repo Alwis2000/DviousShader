@@ -37,7 +37,7 @@ uniform float rainStrength;
 uniform float screenBrightness;
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
-uniform float viewWidth, viewHeight;
+#include "/lib/common_uniforms.glsl"
 
 uniform ivec2 eyeBrightnessSmooth;
 
@@ -189,35 +189,13 @@ void main() {
 		
 		vec3 outNormal = newNormal;
 		
-		/*
-		#ifndef HALF_LAMBERT
-		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
-		#else
-		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		dotNL = dotNL * dotNL;
-		#endif
-		*/
+		#ifdef FLAT_DIRECTIONAL_LIGHTING
 		float dotNL = 1.0;
+		#else
+		float dotNL = dot(newNormal, lightVec) * 0.4 + 0.6;
+		#endif
 
-		/*
-		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
-		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
-		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-			  vanillaDiffuse*= vanillaDiffuse;
-		*/
 		float vanillaDiffuse = 1.0;
-
-		// Faux-Volume Foliage: Puffy Cloud Shading
-		if (foliage > 0.5 || leaves > 0.5) {
-			// Create a spherical normal per block (absolute world space), then transform to view space
-			vec3 absoluteWorldPos = worldPos + cameraPosition;
-			vec3 puffyWorld = normalize(fract(absoluteWorldPos + 0.001) - 0.5);
-			vec3 puffyNormal = normalize(mat3(gbufferModelView) * puffyWorld);
-			vec3 canopyNormal = normalize(puffyNormal * 0.8 + upVec * 0.5 + newNormal * 0.1);
-			dotNL = clamp(dot(canopyNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-			// Multiply by sky lightmap to simulate deep interior occlusion
-			dotNL *= mix(0.4, 1.0, lightmap.y);
-		}
 		
 		lightAlbedo = albedo.rgb + 0.00001;
 		#ifdef MCBL_SS

@@ -1,5 +1,5 @@
 void Tonemap(inout vec3 color) {
-    color *= 1.4;
+    color *= 1.2;
 
     #ifdef COLOR_GRADING
     color.r = pow(max(color.r, 0.0), CG_RC);
@@ -27,5 +27,5 @@ void Tonemap(inout vec3 color) {
     color = max(color, 0.0);
 
     // Final Gamma Correction
-    color = pow(color, vec3(1.0 / 2.2));
+    color = pow(color, vec3(1.0 / 1.75));
 }

@@ -35,7 +35,7 @@ uniform float rainStrength;
 uniform float screenBrightness; 
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
-uniform float viewWidth, viewHeight;
+#include "/lib/common_uniforms.glsl"
 
 uniform ivec2 eyeBrightnessSmooth;
 

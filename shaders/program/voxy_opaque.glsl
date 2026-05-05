@@ -34,7 +34,7 @@ struct VoxyFragmentParameters {
 */
 
 uniform float endFlashIntensity;
-uniform float viewWidth, viewHeight;
+#include "/lib/common_uniforms.glsl"
 
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
@@ -223,35 +223,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters) {
 		float dotNL = 1.0;
 		float vanillaDiffuse = 1.0;
 		#else
-		/*
-		#ifndef HALF_LAMBERT
-		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
-		#else
-		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-		dotNL = dotNL * dotNL;
-		#endif
-		*/
-		float dotNL = 1.0;
-
-		/*
-		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
-		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
-		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-		vanillaDiffuse*= vanillaDiffuse;
-		*/
+		float dotNL = dot(newNormal, lightVec) * 0.4 + 0.6;
 		float vanillaDiffuse = 1.0;
-
-		// Faux-Volume Foliage: Puffy Cloud Shading
-		if (foliage > 0.5 || leaves > 0.5) {
-			// Create a spherical normal per block (absolute world space), then transform to view space
-			vec3 absoluteWorldPos = worldPos + cameraPosition;
-			vec3 puffyWorld = normalize(fract(absoluteWorldPos + 0.001) - 0.5);
-			vec3 puffyNormal = normalize(mat3(gbufferModelView) * puffyWorld);
-			vec3 canopyNormal = normalize(puffyNormal * 0.8 + upVec * 0.5 + newNormal * 0.1);
-			dotNL = clamp(dot(canopyNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
-			// Multiply by sky lightmap to simulate deep interior occlusion
-			dotNL *= mix(0.4, 1.0, lightmap.y);
-		}
 		#endif
 
 		#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS

@@ -15,7 +15,7 @@ uniform float blindFactor, darknessFactor;
 uniform float frameTime, frameTimeCounter;
 uniform float rainStrength;
 uniform float timeAngle, timeBrightness;
-uniform float viewWidth, viewHeight, aspectRatio;
+#include "/lib/common_uniforms.glsl"
 
 uniform ivec2 eyeBrightnessSmooth;
 
