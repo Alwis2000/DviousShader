@@ -1,4 +1,5 @@
 #include "/lib/util/palette.glsl"
+#include "/lib/util/dither.glsl"
 
 vec3 ApplyHandlightColor(vec3 mcblCol, vec3 worldPos) {
     vec3 heldLightPos = worldPos + relativeEyePosition + vec3(0.0, 0.5, 0.0);
@@ -93,7 +94,9 @@ vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldP
 		screenPos.xy = Reprojection(screenPos.xyz);
 	}
 
-	vec3 ssmcblCol = texture2DLod(colortex9, screenPos.xy, 2).rgb;
+	float dither = Bayer8(gl_FragCoord.xy);
+	vec2 jitter = (vec2(dither) - 0.5) * 4.0 / vec2(viewWidth, viewHeight);
+	vec3 ssmcblCol = texture2DLod(colortex9, screenPos.xy + jitter, 2).rgb;
 	float ssmcblFactor = min((ssmcblCol.r + ssmcblCol.g + ssmcblCol.b) * 2048.0, 1.0);
 
 	#if MCBL_SS_MODE == 0 && defined MULTICOLORED_BLOCKLIGHT
@@ -103,8 +106,8 @@ vec3 ApplyMultiColoredBlocklight(vec3 blocklightCol, vec3 screenPos, vec3 worldP
 	ssmcblFactor *= 1.0 - (voxelBounds * mcblIntensity);
 	#endif
 	
-	ssmcblCol = GetNearestPaletteColor(ssmcblCol);
-	ssmcblCol = normalize(ssmcblCol * ssmcblCol) * 0.875 + 0.125;
+	// ssmcblCol = GetNearestPaletteColor(ssmcblCol);
+	ssmcblCol = normalize(ssmcblCol * ssmcblCol + 1e-6) * 0.875 + 0.125;
 	ssmcblCol *= BLOCKLIGHT_I * BLOCKLIGHT_I * 1.5;
 
 	blocklightCol = mix(blocklightCol, ssmcblCol, ssmcblFactor);

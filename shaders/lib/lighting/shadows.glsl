@@ -96,9 +96,8 @@ vec3 GetShadow(vec3 worldPos, vec3 normal, float NoL, float skylight, float isEn
 
     #if defined DISTANT_HORIZONS && !defined VOXY
     float viewLength = length(worldPos);
-    shadowFade *= smoothstep(far + 12.0, far - 4.0, viewLength);
+    shadowFade *= smoothstep(shadowDistance, shadowDistance - 16.0, viewLength);
     #endif
-
     if (shadowFade < 0.00001) return vec3(1.0);
 
     // Depth Bias

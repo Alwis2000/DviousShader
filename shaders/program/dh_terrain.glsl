@@ -41,10 +41,10 @@ uniform float viewWidth, viewHeight;
 
 uniform ivec2 eyeBrightnessSmooth;
 
-uniform vec3 cameraPosition;
+uniform vec3 cameraPosition, previousCameraPosition;
 
-uniform mat4 dhProjectionInverse;
-uniform mat4 gbufferModelView, gbufferModelViewInverse;
+uniform mat4 dhProjection, dhPreviousProjection, dhProjectionInverse;
+uniform mat4 gbufferModelView, gbufferPreviousModelView, gbufferModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowModelView;
 
@@ -58,6 +58,11 @@ uniform sampler3D lighttex1;
 #ifdef MCBL_SS
 uniform sampler2D colortex8;
 uniform sampler2D colortex9;
+#endif
+
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+uniform int heldItemId, heldItemId2;
+uniform vec3 relativeEyePosition;
 #endif
 
 //Common Variables//
@@ -74,6 +79,8 @@ float time = frameTimeCounter * ANIMATION_SPEED;
 
 vec3 lightVec = sunVec * ((timeAngle < 0.5325 || timeAngle > 0.9675) ? 1.0 : -1.0);
 
+mat4 gbufferProjection = dhProjection;
+mat4 gbufferPreviousProjection = dhPreviousProjection;
 mat4 gbufferProjectionInverse = dhProjectionInverse;
 
 //Common Functions//
@@ -114,6 +121,10 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 #include "/lib/surface/hardcodedEmission.glsl"
 #include "/lib/util/encode.glsl"
 
+#ifdef MULTICOLORED_BLOCKLIGHT
+#include "/lib/util/voxelMapHelper.glsl"
+#endif
+
 #if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 #include "/lib/lighting/coloredBlocklight.glsl"
 #endif
@@ -121,9 +132,10 @@ float GetBlueNoise3D(vec3 pos, vec3 normal) {
 
 //Program//
 void main() {
-    vec4 albedo = color;
+	vec4 albedo = color;
 	vec3 newNormal = normal;
 	float shadowMask = 0.0;
+	vec3 lightAlbedo = vec3(0.0);
 
 	{
 		vec2 lightmap = clamp(lmCoord, vec2(0.0), vec2(1.0));
@@ -177,24 +189,37 @@ void main() {
 		
 		vec3 outNormal = newNormal;
 		
+		/*
 		#ifndef HALF_LAMBERT
 		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
 		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
 		dotNL = dotNL * dotNL;
 		#endif
+		*/
+		float dotNL = 1.0;
 
+		/*
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
 		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 			  vanillaDiffuse*= vanillaDiffuse;
+		*/
+		float vanillaDiffuse = 1.0;
 
+		// Faux-Volume Foliage: Puffy Cloud Shading
 		if (foliage > 0.5 || leaves > 0.5) {
-			dotNL = mix(0.6, 1.0, step(0.01, dotNL));
-			vanillaDiffuse = 1.0;
+			// Create a spherical normal per block (absolute world space), then transform to view space
+			vec3 absoluteWorldPos = worldPos + cameraPosition;
+			vec3 puffyWorld = normalize(fract(absoluteWorldPos + 0.001) - 0.5);
+			vec3 puffyNormal = normalize(mat3(gbufferModelView) * puffyWorld);
+			vec3 canopyNormal = normalize(puffyNormal * 0.8 + upVec * 0.5 + newNormal * 0.1);
+			dotNL = clamp(dot(canopyNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+			// Multiply by sky lightmap to simulate deep interior occlusion
+			dotNL *= mix(0.4, 1.0, lightmap.y);
 		}
 		
-		vec3 lightAlbedo = albedo.rgb + 0.00001;
+		lightAlbedo = albedo.rgb + 0.00001;
 		#ifdef MCBL_SS
 		if (lava > 0.5) {
 			lightAlbedo = pow(lightAlbedo, vec3(0.25));
@@ -208,14 +233,8 @@ void main() {
 
 		
 		vec3 shadow = vec3(1.0);
-		#ifdef SHADOW
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, 1.0, dotNL, 
 					vanillaDiffuse, 1.0, emission, 0.0);
-		#else
-		// Fast path for DH when shadows are off
-		shadow = vec3(smoothstep(SHADOW_SKY_FALLOFF, 1.0, lightmap.y));
-		albedo.rgb *= (dotNL * shadow + 0.2) * vanillaDiffuse;
-		#endif
 
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
@@ -262,7 +281,7 @@ uniform int worldTime;
 uniform float frameTimeCounter;
 uniform float timeAngle;
 
-uniform vec3 cameraPosition;
+uniform vec3 cameraPosition, previousCameraPosition;
 uniform vec3 relativeEyePosition;
 
 uniform mat4 dhProjection;

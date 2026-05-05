@@ -312,17 +312,23 @@ void main() {
 		
 		vlAlbedo = mix(vec3(1.0), vlAlbedo, sqrt(albedo.a)) * (1.0 - pow(albedo.a, 64.0));
 		
+		/*
 		#ifndef HALF_LAMBERT
 		float dotNL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
 		float dotNL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
 		dotNL = dotNL * dotNL;
 		#endif
+		*/
+		float dotNL = 1.0;
 
+		/*
 		float NoU = clamp(dot(newNormal, upVec), -1.0, 1.0);
 		float NoE = clamp(dot(newNormal, eastVec), -1.0, 1.0);
 		float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
 			  vanillaDiffuse*= vanillaDiffuse;
+		*/
+		float vanillaDiffuse = 1.0;
 
 		float parallaxShadow = 1.0;
 

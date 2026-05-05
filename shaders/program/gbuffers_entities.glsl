@@ -209,14 +209,20 @@ void main() {
 		albedo.rgb = vec3(0.35);
 		#endif
 		
+		/*
 		#ifndef HALF_LAMBERT
 		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
 		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
 		NoL *= NoL;
 		#endif
+		*/
+		float NoL = 1.0;
 
+		/*
 		float vanillaDiffuse = 1.05; // Standardized to match terrain (with 1.05x compensation)
+		*/
+		float vanillaDiffuse = 1.0;
 
 		/* 
 		if (entityId >= 10104) {

@@ -297,12 +297,16 @@ void main() {
 		viewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
 		viewPos /= viewPos.w;
 
-		vec4 lodData = texture2D(colortex6, texCoord);
-		vec3 lodNormal = DecodeNormal(lodData.xy);
-		float lodShadowMask = lodData.z;
+		// Performance optimization: Only run screen-space shadows where the real shadow map cannot reach.
+		float viewLength = length(viewPos.xyz);
+		if (viewLength > shadowDistance - 16.0) {
+			vec4 lodData = texture2D(colortex6, texCoord);
+			vec3 lodNormal = DecodeNormal(lodData.xy);
+			float lodShadowMask = lodData.z;
 
-		color.rgb *= GetLODShadows(viewPos.xyz, dhDepthTex0, dhProjection, dhProjectionInverse,
-								   lodAmbient, lodLight, dither, lodNormal, lodShadowMask);
+			color.rgb *= GetLODShadows(viewPos.xyz, dhDepthTex0, dhProjection, dhProjectionInverse,
+									   lodAmbient, lodLight, dither, lodNormal, lodShadowMask);
+		}
 
 		Fog(color.rgb, viewPos.xyz);
 	#endif

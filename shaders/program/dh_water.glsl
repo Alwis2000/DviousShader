@@ -66,6 +66,11 @@ uniform sampler2D colortex8;
 uniform sampler2D colortex9;
 #endif
 
+#if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
+uniform int heldItemId, heldItemId2;
+uniform vec3 relativeEyePosition;
+#endif
+
 
 
 #ifdef VOXY
@@ -121,6 +126,10 @@ float GetLuminance(vec3 color) {
 #include "/lib/reflections/simpleReflections.glsl"
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
+
+#ifdef MULTICOLORED_BLOCKLIGHT
+#include "/lib/util/voxelMapHelper.glsl"
+#endif
 
 #if defined MULTICOLORED_BLOCKLIGHT || defined MCBL_SS
 #include "/lib/lighting/coloredBlocklight.glsl"
@@ -382,7 +391,7 @@ uniform int worldTime;
 uniform float frameTimeCounter;
 uniform float timeAngle;
 
-uniform vec3 cameraPosition;
+uniform vec3 cameraPosition, previousCameraPosition;
 uniform vec3 relativeEyePosition;
 
 uniform mat4 dhProjection;

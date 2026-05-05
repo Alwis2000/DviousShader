@@ -172,7 +172,7 @@ vec3 GetMultiColoredBlocklight(vec2 coord, float z0, float z1, float dither) {
 
 	for(int i = 0; i < 4; i++) {
 		vec2 offset = OffsetDist((dither + i) * 0.25) * blurstr;
-		offset = floor(offset * vec2(viewWidth, viewHeight) + 0.5) / vec2(viewWidth, viewHeight);
+		// offset = floor(offset * vec2(viewWidth, viewHeight) + 0.5) / vec2(viewWidth, viewHeight);
 		vec2 samplePos = coord + offset;
 
 		#ifdef MCBL_SS_ANTI_BLEED
@@ -219,12 +219,12 @@ vec3 GetMultiColoredBlocklight(vec2 coord, float z0, float z1, float dither) {
 #ifdef CONTACT_SHADOWS
 float GetContactShadow(vec3 viewPos, vec3 lightVec, vec3 normal, float dither) {
     float shadow = 1.0;
-    int steps = 16;
-    float rayLength = 0.6;
+    int steps = 24;
+    float rayLength = 2.5;
     vec3 rayStep = lightVec * (rayLength / float(steps));
     
     // Start slightly off the surface to avoid self-shadowing
-    vec3 currentPos = viewPos + normal * 0.02 + rayStep * (dither * 0.5 + 0.1);
+    vec3 currentPos = viewPos + normal * 0.05 + rayStep * (dither * 0.5 + 0.1);
     
     for(int i = 0; i < steps; i++) {
         vec4 projPos = gbufferProjection * vec4(currentPos, 1.0);
