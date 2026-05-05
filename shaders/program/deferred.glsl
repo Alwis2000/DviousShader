@@ -18,7 +18,6 @@ uniform float cloudHeight;
 uniform float far, near;
 uniform float frameTimeCounter;
 uniform float rainStrength;
-uniform float shadowDistanceUniform;
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
 uniform float viewWidth, viewHeight, aspectRatio;
@@ -96,25 +95,10 @@ float GetNonLinearDepth(float linDepth, mat4 projMatrix) {
     return (zw.x / zw.y) * 0.5 + 0.5;
 }
 
-
-#include "/lib/color/blocklightColor.glsl"
-#include "/lib/color/dimensionColor.glsl"
-#include "/lib/color/lightSkyColor.glsl"
-#include "/lib/color/skyColor.glsl"
-#include "/lib/color/waterColor.glsl"
-#include "/lib/util/dither.glsl"
-#include "/lib/atmospherics/weatherDensity.glsl"
-#include "/lib/atmospherics/sky.glsl"
-#include "/lib/atmospherics/fog.glsl"
-#include "/lib/atmospherics/stars.glsl"
-
-
-
-
 #if defined DISTANT_HORIZONS || defined VOXY
 #ifdef SHADOW
 vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 projectionInverse,
-				   vec3 ambientCol, vec3 lightCol, float dither, vec3 normal, float shadowMask, float skylight, float startDist) {
+				   vec3 ambientCol, vec3 lightCol, float dither, vec3 normal, float shadowMask) {
 	#if defined OVERWORLD || defined END
 	float shadow = 1.0;
 
@@ -134,56 +118,39 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 
 	vec2 pixelSize = 1.0 / vec2(viewWidth, viewHeight);
 
-	// Minimum offset to prevent shadow acne on the surface being shaded
-	// float startDist = 16.0; // Now passed as argument
-
-	for (int i = 0; i < 4; i++) {
-		float traceStep = (i * i * 0.7 + i * 0.5) + startDist + dither * (i * 0.4 + 0.4);
+	for (int i = 0; i < 16; i++) {
+		float traceStep = (exp2(i * 0.32) - 1.0) * 4.0 + 0.1;
 		vec3 tracePos = viewPos + traceOffset + lightVec * traceStep;
 
-		vec4 pos = gbufferProjection * vec4(tracePos, 1.0);
+		vec4 pos = projection * vec4(tracePos, 1.0);
 		pos.xy = pos.xy / pos.w * 0.5 + 0.5;
 
-		if (pos.x < 0.0 || pos.x >= 1.0 || pos.y < 0.0 || pos.y >= 1.0) break;
+		if (pos.x < 0.0 || pos.x > 1.0 || pos.y < 0.0 || pos.y > 1.0) break;
 
-		ivec2 texelPos = ivec2(pos.xy * vec2(viewWidth, viewHeight));
 		#ifdef VOXY
-		float zOpaque = texelFetch(vxDepthTexOpaque, texelPos, 0).r;
-		float zTrans = texelFetch(vxDepthTexTrans, texelPos, 0).r;
-		traceZ = min(zOpaque, zTrans);
-		#elif defined DISTANT_HORIZONS
-		float zOpaque = texelFetch(dhDepthTex0, texelPos, 0).r;
-		float zTrans = texelFetch(dhDepthTex1, texelPos, 0).r;
-		traceZ = min(zOpaque, zTrans);
+		traceZ = texelFetch(depthtex0, ivec2(pos.xy * vec2(viewWidth, viewHeight)), 0).r;
+		float linZ = traceZ * 2.0 - 1.0;
+		zDelta = -tracePos.z - (- (linZ * gbufferProjectionInverse[2].z + gbufferProjectionInverse[3].z) / (linZ * gbufferProjectionInverse[2].w + gbufferProjectionInverse[3].w));
+
+		if (traceZ >= 1.0) {
+		#endif
+			traceZ = texelFetch(depthtex, ivec2(pos.xy * vec2(viewWidth, viewHeight)), 0).r;
+
+			float linZ2 = traceZ * 2.0 - 1.0;
+			zDelta = -tracePos.z - (- (linZ2 * projectionInverse[2].z + projectionInverse[3].z) / (linZ2 * projectionInverse[2].w + projectionInverse[3].w));
+		#ifdef VOXY
+		}
 		#endif
 
-		if (traceZ < 1.0) {
-			zDelta = -tracePos.z - GetLinearDepth(traceZ, projectionInverse);
-		} else {
-			zDelta = -1.0; 
-		}
-
-		float currentBias = 0.05 * SHADOW_MAP_BIAS;
-		if (zDelta > currentBias && zDelta < (thickness + traceStep * 0.05)) {
+		float currentBias = (0.15 + traceStep * 0.02) * SHADOW_MAP_BIAS;
+		if (zDelta > currentBias && zDelta < (thickness + traceStep * 0.4)) {
 			shadow = 0.0;
 			break;
 		}
-		thickness += 0.5;
+		thickness += 2.0;
 	}
 
-	float NoU = clamp(dot(normal, upVec), -1.0, 1.0);
-	float NoE = clamp(dot(normal, eastVec), -1.0, 1.0);
-	float vanillaDiffuse = (0.25 * NoU + 0.75) + (0.667 - abs(NoE)) * (1.0 - abs(NoU)) * 0.15;
-
-	#ifdef OVERWORLD
-	vec3 shadowLighting = (ambientCol * skylight + minIndigo) * shadowToning;
-	vec3 litLighting = lightCol * vanillaDiffuse;
-	#else
-	vec3 shadowLighting = ambientCol;
-	vec3 litLighting = lightCol * vanillaDiffuse;
-	#endif
-
-	vec3 shadowCol = shadowLighting / max(mix(shadowLighting, litLighting, shadowMask), vec3(0.001));
+	vec3 shadowCol = ambientCol / mix(ambientCol, lightCol, shadowMask);
 
 	return mix(shadowCol, vec3(1.0), shadow);
 	#else
@@ -192,14 +159,22 @@ vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 proje
 }
 #else
 vec3 GetLODShadows(vec3 viewPos, sampler2D depthtex, mat4 projection, mat4 projectionInverse,
-				   vec3 ambientCol, vec3 lightCol, float dither, vec3 normal, float shadowMask, float skylight, float startDist) {
+				   vec3 ambientCol, vec3 lightCol, float dither, vec3 normal, float shadowMask) {
 	return vec3(1.0);
 }
 #endif
 #endif
 
-
-
+#include "/lib/color/blocklightColor.glsl"
+#include "/lib/color/dimensionColor.glsl"
+#include "/lib/color/lightSkyColor.glsl"
+#include "/lib/color/skyColor.glsl"
+#include "/lib/color/waterColor.glsl"
+#include "/lib/util/dither.glsl"
+#include "/lib/atmospherics/weatherDensity.glsl"
+#include "/lib/atmospherics/sky.glsl"
+#include "/lib/atmospherics/fog.glsl"
+#include "/lib/atmospherics/stars.glsl"
 
 #ifdef OUTLINE_ENABLED
 #include "/lib/util/outlineOffset.glsl"
@@ -247,12 +222,10 @@ void main() {
 
 	#ifdef VOXY
 	float vxZ = texture2D(vxDepthTexOpaque, texCoord).r;
-	vxZ = min(vxZ, texture2D(vxDepthTexTrans, texCoord).r);
 	#endif
 
 	#ifdef DISTANT_HORIZONS
 	float dhZ = texture2D(dhDepthTex0, texCoord).r;
-	dhZ = min(dhZ, texture2D(dhDepthTex1, texCoord).r);
 	#endif
 
 	#if defined DISTANT_HORIZONS || defined VOXY
@@ -296,34 +269,9 @@ void main() {
 	color.rgb = mix(color.rgb, innerOutline.rgb, innerOutline.a);
 	#endif
 
-
 	if (z < 1.0) {
-		#if defined DISTANT_HORIZONS || defined VOXY
-		#ifdef SHADOW
-		vec4 lodData = texture2D(colortex3, texCoord);
-		vec3 normal = DecodeNormal(lodData.xy);
-
-		float shadowMask = lodData.z;
-		float skylight = lodData.w;
-
-		vec3 lodShadow = vec3(1.0);
-		float lodStartDist = 0.5;
-		if (shadowMask > 0.01) {
-			#ifdef VOXY
-			lodShadow = GetLODShadows(viewPos.xyz, vxDepthTexOpaque, vxProj, vxProjInv,
-										lodAmbient, lodLight, dither, normal, shadowMask, skylight, lodStartDist);
-			#elif defined DISTANT_HORIZONS
-			lodShadow = GetLODShadows(viewPos.xyz, dhDepthTex0, dhProjection, dhProjectionInverse,
-									lodAmbient, lodLight, dither, normal, shadowMask, skylight, lodStartDist);
-			#endif
-		}
-
-		color.rgb *= lodShadow;
-		#endif
-		#endif
 
 		Fog(color.rgb, viewPos.xyz);
-
 	#ifdef VOXY
 	} else if (vxZ < 1.0) {
 		z = 1.0 - 2e-5;
@@ -332,17 +280,12 @@ void main() {
 		viewPos = vxProjInv * (vxScreenPos * 2.0 - 1.0);
 		viewPos /= viewPos.w;
 
-		vec4 lodData = texture2D(colortex3, texCoord);
+		vec4 lodData = texture2D(colortex6, texCoord);
 		vec3 lodNormal = DecodeNormal(lodData.xy);
 		float lodShadowMask = lodData.z;
-		float lodSkylight = lodData.w;
-		vec3 lodShadow = vec3(1.0);
-		if (lodShadowMask > 0.01) {
-			lodShadow = GetLODShadows(viewPos.xyz, vxDepthTexOpaque, vxProj, vxProjInv,
-										lodAmbient, lodLight, dither, lodNormal, lodShadowMask, lodSkylight, 0.0);
-		}
-		
-		color.rgb *= lodShadow;
+
+		color.rgb *= GetLODShadows(viewPos.xyz, vxDepthTexOpaque, vxProj, vxProjInv,
+									lodAmbient, lodLight, dither, lodNormal, lodShadowMask);
 
 		Fog(color.rgb, viewPos.xyz);
 	#endif
@@ -354,22 +297,16 @@ void main() {
 		viewPos = dhProjectionInverse * (dhScreenPos * 2.0 - 1.0);
 		viewPos /= viewPos.w;
 
-		vec4 lodData = texture2D(colortex3, texCoord);
+		vec4 lodData = texture2D(colortex6, texCoord);
 		vec3 lodNormal = DecodeNormal(lodData.xy);
 		float lodShadowMask = lodData.z;
-		float lodSkylight = lodData.w;
-		vec3 lodShadow = vec3(1.0);
-		if (lodShadowMask > 0.01) {
-			lodShadow = GetLODShadows(viewPos.xyz, dhDepthTex0, dhProjection, dhProjectionInverse,
-										lodAmbient, lodLight, dither, lodNormal, lodShadowMask, lodSkylight, 0.0);
-		}
-		
-		color.rgb *= lodShadow;
+
+		color.rgb *= GetLODShadows(viewPos.xyz, dhDepthTex0, dhProjection, dhProjectionInverse,
+								   lodAmbient, lodLight, dither, lodNormal, lodShadowMask);
 
 		Fog(color.rgb, viewPos.xyz);
 	#endif
-	}
- else {
+	} else {
 		#if defined OVERWORLD && defined SKY_DEFERRED
 		color.rgb += GetSkyColor(viewPos.xyz, false);
 
@@ -427,11 +364,7 @@ void main() {
 	float vanillaLinearZ = GetLinearDepth(vanillaTransZ, gbufferProjectionInverse);
 
 	if (vxLinearZ < vanillaLinearZ) {
-		vec3 voxyLinearColor = voxyTransparentColor.rgb;
-		#if ALPHA_BLEND == 0
-		voxyLinearColor *= voxyLinearColor;
-		#endif
-		color.rgb = mix(color.rgb, voxyLinearColor, voxyTransparentColor.a);
+		color.rgb = mix(color.rgb, voxyTransparentColor.rgb, voxyTransparentColor.a);
 	}
 	#endif
 

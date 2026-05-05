@@ -36,16 +36,15 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     float shadowMult = (1.0 - 0.95 * rainStrength) * shadowFade;
     vec3 toonShadow = fullShadow * shadowMult;
     
-    vec3 ambientPart = (ambientCol * lightmap.y + minIndigo) * shadowToning;
-    vec3 directPart = lightCol * vanillaDiffuse;
-    vec3 sceneLighting = mix(ambientPart, directPart, toonShadow);
+    vec3 shadowToning = mix(vec3(1.0), vec3(1.05, 0.8, 1.3), sunVisibility * (1.0 - rainStrength * 0.5));
+    vec3 minIndigo = vec3(0.12, 0.12, 0.18) * (sunVisibility * sunVisibility);
+
+    vec3 sceneLighting = mix((ambientCol * lightmap.y + minIndigo) * shadowToning, lightCol, toonShadow);
     sceneLighting *= skylightSqr;
     #endif
 
     #ifdef END
-    vec3 ambientPart = endCol.rgb * 0.015;
-    vec3 directPart = endCol.rgb * 0.04 * vanillaDiffuse;
-    vec3 sceneLighting = ambientPart + directPart * fullShadow;
+    vec3 sceneLighting = endCol.rgb * (0.04 * fullShadow + 0.015);
     #if MC_VERSION >= 12109
     sceneLighting *= (1.0 + endFlashIntensity) * skylightSqr;
     #endif
@@ -79,6 +78,6 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     if (isEntity > 0.5) albedo *= vanillaDiffuse;
     albedo *= smoothLighting * smoothLighting;
     #else
-    albedo *= smoothLighting * smoothLighting;
+    albedo *= vanillaDiffuse * smoothLighting * smoothLighting;
     #endif
 }

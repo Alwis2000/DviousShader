@@ -29,7 +29,7 @@ vec4 DistortShadow(vec3 shadowPos) {
             distortedR = mix(start, 1.0, distorted);
 
             float deriv = (1.0 - start) / (1.0 - rCenter) * (1.0 - k) / pow(1.0 - k + k * r1, 2.0);
-            biasMult = pow(densityRatio / max(deriv, 0.0001), 0.8);
+            biasMult = densityRatio / max(deriv, 0.0001);
         }
         shadowPos.xy *= (distortedR / r);
     }

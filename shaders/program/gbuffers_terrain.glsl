@@ -38,7 +38,6 @@ uniform float near, far;
 uniform float nightVision;
 uniform float rainStrength;
 uniform float screenBrightness; 
-uniform float shadowDistanceUniform;
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
 uniform float viewWidth, viewHeight;
@@ -115,8 +114,6 @@ float GetLuminance(vec3 color) {
 #include "/lib/lighting/forwardLighting.glsl"
 #include "/lib/surface/ggx.glsl"
 #include "/lib/surface/hardcodedEmission.glsl"
-#include "/lib/util/encode.glsl"
-
 
 
 
@@ -130,17 +127,14 @@ float GetLuminance(vec3 color) {
 
 //Program//
 void main() {
-	vec3 newNormal = normal;
-	float emission = 0.0;
-	float shadowMask = 1.0;
-	vec3 shadow = vec3(1.0);
-	vec3 lightAlbedo = vec3(0.0);
-	float smoothness = 0.0;
-
     vec4 albedo = texture2D(texture, texCoord) * vec4(color.rgb, 1.0);
 
 	// Early alpha discard — skip all lighting math for transparent leaf/plant pixels
 	if (albedo.a < 0.1) discard;
+
+	vec3 newNormal = normal;
+	float smoothness = 0.0;
+	vec3 lightAlbedo = vec3(0.0);
 
 
 	{
@@ -154,7 +148,7 @@ void main() {
 		float ore       = float(mat > 5.98 && mat < 6.02);
 		float netherOre = float(mat > 6.98 && mat < 7.02);
 
-		emission = (emissive + candle + lava);
+		float emission        = (emissive + candle + lava);
 		vec3 baseReflectance  = vec3(0.04);
 		
 		vec3 hsv = vec3(0.0);
@@ -267,7 +261,7 @@ void main() {
 		}
 		#endif
 		
-		shadow = vec3(0.0);
+		vec3 shadow = vec3(0.0);
 		GetLighting(albedo.rgb, shadow, viewPos, worldPos, normal, lightmap, color.a, NoL, 
 					vanillaDiffuse, parallaxShadow, emission, 0.0);
 
@@ -282,23 +276,12 @@ void main() {
 		#if ALPHA_BLEND == 0
 		albedo.rgb = sqrt(max(albedo.rgb, vec3(0.0)));
 		#endif
-
-		shadowMask = shadow.r * (1.0 - emission) * lightmap.y * lightmap.y;
-		#ifdef OVERWORLD
-		shadowMask *= (1.0 - 0.95 * rainStrength);
-		#endif
 	}
 
-	/* DRAWBUFFERS:083 */
-	gl_FragData[0] = albedo;
-	gl_FragData[1] = vec4(lightAlbedo, 1.0);
-	gl_FragData[2] = vec4(EncodeNormal(newNormal), shadowMask, lmCoord.y);
+		/* DRAWBUFFERS:08 */
+		gl_FragData[0] = albedo;
+		gl_FragData[1] = vec4(lightAlbedo, 1.0);
 }
-
-
-
-
-
 
 #endif
 
