@@ -38,7 +38,7 @@ uniform float rainStrength;
 uniform float screenBrightness; 
 uniform float shadowFade;
 uniform float timeAngle, timeBrightness;
-#include "/lib/common_uniforms.glsl"
+uniform float viewWidth, viewHeight;
 
 uniform ivec2 eyeBrightnessSmooth;
 
@@ -233,13 +233,27 @@ void main() {
 		}
 		#endif
 		
-		#ifdef FLAT_DIRECTIONAL_LIGHTING
-		float NoL = 1.0;
+		/*
+		#ifndef HALF_LAMBERT
+		float NoL = clamp(dot(newNormal, lightVec), 0.0, 1.0);
 		#else
-		float NoL = dot(newNormal, lightVec) * 0.4 + 0.6;
+		float NoL = clamp(dot(newNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+		NoL *= NoL;
 		#endif
+		*/
+		float NoL = 1.0;
 
-
+		// Faux-Volume Foliage: Puffy Cloud Shading
+		if (foliage > 0.5 || leaves > 0.5) {
+			// Create a spherical normal per block (absolute world space), then transform to view space
+			vec3 absoluteWorldPos = worldPosStaticV + cameraPosition;
+			vec3 puffyWorld = normalize(fract(absoluteWorldPos + 0.001) - 0.5);
+			vec3 puffyNormal = normalize(mat3(gbufferModelView) * puffyWorld);
+			vec3 canopyNormal = normalize(puffyNormal * 0.8 + upVec * 0.5 + newNormal * 0.1);
+			NoL = clamp(dot(canopyNormal, lightVec) * 0.5 + 0.5, 0.0, 1.0);
+			// Multiply by sky lightmap to simulate deep interior occlusion
+			NoL *= mix(0.4, 1.0, lightmap.y);
+		}
 
 		float vanillaDiffuse = 1.0;
 		

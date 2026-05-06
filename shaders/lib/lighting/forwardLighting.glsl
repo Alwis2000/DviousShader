@@ -5,6 +5,11 @@
 void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos, vec3 normal, 
                  vec2 lightmap, float smoothLighting, float dotNL, float vanillaDiffuse,
                  float parallaxShadow, float emission, float isEntity) {
+    smoothLighting = 1.0;
+    dotNL = 1.0;
+    vanillaDiffuse = 1.0;
+
+
     float skylightCurve = pow(lightmap.y, 4.0);
 
     #ifdef FLAT_DIRECTIONAL_LIGHTING
@@ -16,10 +21,17 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     shadow *= parallaxShadow;
     
     #ifdef SHADOW
-    vec3 fullShadow = vec3(shadow * dotNL);
+    vec3 fullShadow = max(shadow * dotNL, vec3(0.0));
     #else
-    vec3 fullShadow = vec3(dotNL);
+    // Stylized directional shading
+    #ifndef HALF_LAMBERT
+    vec3 fullShadow = vec3(smoothstep(0.0, 0.15, dotNL));
+    #else
+    vec3 fullShadow = vec3(smoothstep(0.4, 0.6, dotNL));
     #endif
+    #endif
+
+    fullShadow = mix(vec3(1.0), fullShadow, 0.65);
     
     #ifdef OVERWORLD
     float shadowMult = (1.0 - 0.95 * rainStrength) * shadowFade;
@@ -62,15 +74,9 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
         
     // Apply the Subsurface Color Overlay only to skylight-related lighting
     // This ensures block lighting (torches, etc.) remains unaffected.
-    // Subsurface Color Overlay: orange (sky-lit) → indigo (dark)
     vec3 sssOrange = vec3(1.1, 1, 1);
     vec3 sssIndigo = vec3(0.1, 0.0, 0.7);
     vec3 sssOverlay = mix(sssIndigo, sssOrange, skylightCurve);
-
-    // Height-based factor: Sea level (Y=62) to Mountain top (Y=150)
-    float worldHeight = worldPos.y + cameraPosition.y;
-    float heightFactor = clamp((worldHeight - 62.0) / 56.0, 0.0, 1.0); // 150 - 62 = 88
-    sssOverlay *= mix(0.85, 2.0, heightFactor); // Broadened range for stronger effect
 
     vec3 skyLighting = (sceneLighting + minLighting + nightVision * 0.25) * sssOverlay;
         

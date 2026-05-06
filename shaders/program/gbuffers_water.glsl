@@ -70,7 +70,7 @@ uniform float endFlashIntensity;
 uniform float far, near;
 uniform float screenBrightness; 
 uniform float shadowFade;
-#include "/lib/common_uniforms.glsl"
+uniform float viewWidth, viewHeight;
 
 uniform ivec2 eyeBrightnessSmooth;
 

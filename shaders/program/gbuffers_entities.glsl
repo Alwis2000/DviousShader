@@ -56,7 +56,7 @@ uniform float near, far;
 uniform float nightVision;
 uniform float screenBrightness; 
 uniform float shadowFade;
-#include "/lib/common_uniforms.glsl"
+uniform float viewWidth, viewHeight;
 
 uniform ivec2 eyeBrightnessSmooth;
 

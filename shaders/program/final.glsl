@@ -15,8 +15,8 @@ varying vec2 texCoord;
 //Uniforms//
 uniform sampler2D colortex1;
 
-#include "/lib/common_uniforms.glsl"
-uniform float frameTimeCounter;
+uniform float viewWidth, viewHeight;
+uniform float aspectRatio, frameTimeCounter;
 
 //Optifine Constants//
 /*

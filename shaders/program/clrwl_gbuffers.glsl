@@ -17,7 +17,7 @@ uniform int worldTime;
 uniform float frameTimeCounter;
 uniform float near, far;
 uniform float timeAngle, timeBrightness;
-#include "/lib/common_uniforms.glsl"
+uniform float viewWidth, viewHeight;
 uniform float shadowFade;
 uniform float nightVision;
 uniform float rainStrength;
