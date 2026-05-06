@@ -37,10 +37,18 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     float shadowMult = (1.0 - 0.95 * rainStrength) * shadowFade;
     vec3 toonShadow = fullShadow * shadowMult;
     
+<<<<<<< HEAD
     vec3 ambientTotal = ambientCol * lightmap.y;
 
     vec3 sceneLighting = mix(ambientTotal, lightCol, toonShadow);
     sceneLighting *= skylightCurve * 0.7; // Toned down brightness for flat lighting
+=======
+    vec3 shadowToning = mix(vec3(1.0), vec3(1.05, 0.8, 1.3), sunVisibility * (1.0 - rainStrength * 0.5));
+    vec3 minIndigo = vec3(0.12, 0.12, 0.18) * (sunVisibility * sunVisibility);
+
+    vec3 sceneLighting = mix((ambientCol * lightmap.y + minIndigo) * shadowToning, lightCol, toonShadow);
+    sceneLighting *= skylightSqr;
+>>>>>>> parent of 765511a (RayMarching implemention redefined.)
     #endif
 
     #ifdef END
@@ -72,6 +80,7 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     vanillaDiffuse = mix(vanillaDiffuse, 1.0, lightFlatten);
     smoothLighting = mix(smoothLighting, 1.0, lightFlatten);
         
+<<<<<<< HEAD
     // Apply the Subsurface Color Overlay only to skylight-related lighting
     // This ensures block lighting (torches, etc.) remains unaffected.
     vec3 sssOrange = vec3(1.1, 1, 1);
@@ -81,4 +90,14 @@ void GetLighting(inout vec3 albedo, out vec3 shadow, vec3 viewPos, vec3 worldPos
     vec3 skyLighting = (sceneLighting + minLighting + nightVision * 0.25) * sssOverlay;
         
     albedo *= max(skyLighting + blockLighting + emissiveLighting, vec3(0.0));
+=======
+    albedo *= max(sceneLighting + blockLighting + emissiveLighting + minLighting + nightVision * 0.25, vec3(0.0));
+    
+    #ifdef FLAT_DIRECTIONAL_LIGHTING
+    if (isEntity > 0.5) albedo *= vanillaDiffuse;
+    albedo *= smoothLighting * smoothLighting;
+    #else
+    albedo *= vanillaDiffuse * smoothLighting * smoothLighting;
+    #endif
+>>>>>>> parent of 765511a (RayMarching implemention redefined.)
 }

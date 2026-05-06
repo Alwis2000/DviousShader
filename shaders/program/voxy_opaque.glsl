@@ -34,7 +34,10 @@ struct VoxyFragmentParameters {
 */
 
 uniform float endFlashIntensity;
+<<<<<<< HEAD
 uniform float viewWidth, viewHeight;
+=======
+>>>>>>> parent of 765511a (RayMarching implemention redefined.)
 
 //Common Variables//
 mat4 gbufferModelView = vxModelView;
